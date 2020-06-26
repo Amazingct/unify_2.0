@@ -2,13 +2,15 @@ import pyrebase
 import json
 import client as cl
 import threading as t
-import time
+import Gui as g
+from time import sleep
 #  path to configuration files
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/Unify_2.0/configurations/"
+path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
 
-with open(path+ "cofig.json") as config_file:
+
+with open(path + "cofig.json") as config_file:
     config = json.loads(config_file.read())
 fire_base = pyrebase.initialize_app(config)
 auth = fire_base.auth()
@@ -41,10 +43,12 @@ def sign_up():
 
 
 def sign_in():
+
     try:
         with open(path + "user.json", "r") as user_file:
             user = json.loads(user_file.read())
             print("ID:", user["localId"])
+            g.email = user["email"]
             return user
     except Exception as e:
         print("Not logged in yet")
@@ -56,6 +60,7 @@ def sign_in():
         print("logged in:", user)
         with open(path + "user.json", "w") as user_file:
             user_file.write(json.dumps(user))
+            g.email = user["email"]
             return user
     except Exception as e:
         print("User dose not exit or Wrong password? Create account using Unify App")
@@ -184,7 +189,6 @@ class Hub:
         return rx
 
 
-
-
-
+def start_gui():
+    g.start_gui()
 
