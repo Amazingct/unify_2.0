@@ -1,10 +1,10 @@
 {
-    "apiKey": "AIzaSyBP90L7SqdrCtAPln6XtfO6h307xJAoNXQ",
-    "authDomain": "unify-has.firebaseapp.com",
-    "databaseURL": "https://unify-has.firebaseio.com",
-    "projectId": "unify-has",
-    "storageBucket": "unify-has.appspot.com",
-    "messagingSenderId": "568043900925",
-    "appId": "1:568043900925:web:c1e0e5c64846798d791394",
-    "measurementId": "G-8L96JRE86Y"
+    "apiKey": "AIzaSyBE60qpNe65viKstXjTmgq2fnpsHwCSOjU",
+    "authDomain": "unifyhas-8e56e.firebaseapp.com",
+    "databaseURL": "https://unifyhas-8e56e.firebaseio.com",
+    "projectId": "unifyhas-8e56e",
+    "storageBucket": "unifyhas-8e56e.appspot.com",
+    "messagingSenderId": "738432059772",
+    "appId": "1:738432059772:web:23586333db1943685d3cf9",
+    "measurementId": "G-EVWRDMYSPQ"
 }

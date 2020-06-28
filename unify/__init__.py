@@ -3,11 +3,13 @@ import json
 import client as cl
 import threading as t
 import Gui as g
+import logs
 from time import sleep
 #  path to configuration files
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
+
 
 
 with open(path + "cofig.json") as config_file:
@@ -79,6 +81,7 @@ class Hub:
         self.id = user["localId"]
         self.email = user["email"]
         print(self.email)
+        logs.log_cinfig()
 
     def _connection_thread(self):
         print("socket started")

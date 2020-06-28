@@ -1,7 +1,7 @@
 import socket
 import json
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
-HOST = '10.42.0.1'
+HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
 s = socket.socket()
 s.bind((HOST, PORT))

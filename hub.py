@@ -1,6 +1,6 @@
 import unify
 from time import sleep
-# unify.sign_up()
+#unify.sign_up()
 user = unify.sign_in()
 hub = unify.Hub(user)
 hub.start_sync_firebase_clients_localdb_thread()
