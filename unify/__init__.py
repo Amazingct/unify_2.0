@@ -19,10 +19,10 @@ auth = fire_base.auth()
 database = fire_base.database()
 
 
-def get_hub_sensor_data():
-    temperature = 0
-    humidity = 0
-    data = {"T":temperature, "H":humidity}
+def update_hub_sensor_data(user, tag):
+    temperature = "8 *C"
+    data = {"State": temperature}
+    d = database.child("users").child(user).child(tag).update(data)
 
     return
 
@@ -121,12 +121,13 @@ class Hub:
 
                     for device in devices:
                         try:
-                            device.send_to_client(data[device.ip]["State"])
+                            device.send_to_client(int(data[device.ip]["State"]))
                         except Exception as e:
                             print("devices:", e)
                             device.close()
                             devices.remove(device)
-
+                    # update sensor value on firebase
+                    update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
             except Exception as e:
                 print("Sync:", e)
 
