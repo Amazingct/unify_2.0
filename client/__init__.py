@@ -21,24 +21,30 @@ def new_client_or_not(ip):
         return True, {"NEW":"NEW"}
 
 
-def add_new_client_to_local_db(database, hub, ip):
-    col = {}
-    c_name = input("Enter Name: ")
-    c_type = input("Enter Type: ")
-    # add to fire-base
-    data = {'IP': ip, 'Name': c_name, 'Type': c_type, 'state': 0}
-    # post new data with new tag
-    result = hub.add_client(IP= ip,Name= c_name,Type=c_type,State=0)
+def add_new_client_to_db(hub, ip):
+    wrong = True
+
+    while wrong == True:
+        col = {}
+        c_name = input("Enter Name: ")
+        c_type = input("Enter Type: ").upper()
+
+        if c_type is "T":
+            # post new data with new tag
+            result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=False)
+            wrong = False
+        elif c_type is "R" or c_type is "S":
+            # post new data with new tag
+            result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=0)
+            wrong = False
+        else:
+            print("Invalid Type (R,T or S)")
+            wrong = True
+    # sync will automatically add to local database
     print(result)
     c_id = result["name"]
     # add to local db
     col.update({ip: {"ID": c_id, "Name": c_name, "Type": c_type, "state": 0}})
-
-    with open(path+"db.json", "r") as db:
-        old = json.loads(db.read())
-    with open(path+"db.json", "w") as db:
-        old.update(col)
-        db.write(json.dumps(old))
     # return info
     return c_id,c_name,c_type
 
@@ -63,7 +69,7 @@ class Client:
             print(addr, "connected")
             a = input("Do you want to add new client (y/n) ? ")
             if a == "y":
-                id, name, ttype = add_new_client_to_local_db(database, hub, addr[0])
+                id, name, ttype = add_new_client_to_db(hub, addr[0])
                 self.name = name
                 self.id = id
                 self.type = ttype

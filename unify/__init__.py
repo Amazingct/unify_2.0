@@ -1,5 +1,5 @@
 import pyrebase
-import json
+import json, time
 import client as cl
 import threading as t
 import Gui as g
@@ -9,7 +9,6 @@ from time import sleep
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
-
 
 
 with open(path + "cofig.json") as config_file:
@@ -23,7 +22,6 @@ def update_hub_sensor_data(user, tag):
     temperature = "8 *C"
     data = {"State": temperature}
     d = database.child("users").child(user).child(tag).update(data)
-
     return
 
 
@@ -96,40 +94,46 @@ class Hub:
 
     def _sync(self):
         print("sync started")
+
         while True:
-            try:
-                read = self.get_all_data()
-                # when it tries to read from fire base and ID has been deleted from firebase read is "None"
-                if str(read) == "None":
-                    self.update_localdb_data({})
+            update = database.child("users").child("Update").get().val()
+            # print("Upate is", update)
+            if update is True: # if update is set to true on firebase (data has been modified) then sync
+                try:
+                    read = self.get_all_data()
+                    # when it tries to read from fire base and ID has been deleted from firebase read is "None"
+                    if str(read) == "None":
+                        self.update_localdb_data({})
 
-                else:
-                    # if it exit, proceed to syncing local db
-                    data = {}
-                    for key, val in read.items():
-                        data.update({read[key]["IP"]:
-                            {
-                                "ID": key,
-                                "Name": read[key]["Name"],
-                                "Type": read[key]["Type"],
-                                "State": read[key]["State"]
-                            }
-                        })
+                    else:
+                        # if it exit, proceed to syncing local db
+                        data = {}
+                        for key, val in read.items():
+                            data.update({read[key]["IP"]:
+                                {
+                                    "ID": key,
+                                    "Name": read[key]["Name"],
+                                    "Type": read[key]["Type"],
+                                    "State": read[key]["State"]
+                                }
+                            })
 
-                    self.update_localdb_data(data)
-                    # send states to client
+                        self.update_localdb_data(data)
+                        # send states to client
 
-                    for device in devices:
-                        try:
-                            device.send_to_client(int(data[device.ip]["State"]))
-                        except Exception as e:
-                            print("devices:", e)
-                            device.close()
-                            devices.remove(device)
-                    # update sensor value on firebase
-                    update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
-            except Exception as e:
-                print("Sync:", e)
+                        for device in devices:
+                            try:
+                                device.send_to_client(int(data[device.ip]["State"]))
+                            except Exception as e:
+                                print("devices:", e)
+                                device.close()
+                                devices.remove(device)
+                        # update sensor value on firebase
+                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
+                        update = False  # after syncing change update to False
+                        time.sleep(1)
+                except Exception as e:
+                    print("Sync:", e)
 
     def start_connection_thread(self):
         t.Thread(target=self._connection_thread).start()
