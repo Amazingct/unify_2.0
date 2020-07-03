@@ -2,7 +2,7 @@ import pyrebase
 import json, time
 import client as cl
 import threading as t
-import Gui as g
+import Gui as gui
 import logs
 from time import sleep
 #  path to configuration files
@@ -48,7 +48,7 @@ def sign_in():
         with open(path + "user.json", "r") as user_file:
             user = json.loads(user_file.read())
             print("ID:", user["localId"])
-            g.email = user["email"]
+            gui.email = user["email"]
             return user
     except Exception as e:
         print("Not logged in yet")
@@ -60,7 +60,7 @@ def sign_in():
         print("logged in:", user)
         with open(path + "user.json", "w") as user_file:
             user_file.write(json.dumps(user))
-            g.email = user["email"]
+            gui.email = user["email"]
             return user
     except Exception as e:
         print("User dose not exit or Wrong password? Create account using Unify App")
@@ -198,5 +198,5 @@ class Hub:
 
 
 def start_gui():
-    g.start_gui()
+    gui.start_gui()
 
