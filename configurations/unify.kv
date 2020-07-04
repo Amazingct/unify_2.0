@@ -80,13 +80,18 @@
 
 <Home>:
     name: "home"
+    email: email
+    on_pre_enter: root.render("fresh_login")
+
     GridLayout:
-        cols: 2
+        cols: 3
         Button:
             text: "LOGOUT"
             on_release: root.button_action("logout")
         Label:
-            text: root.h
+            id: email
+            text: "hh"
+
 
 
 

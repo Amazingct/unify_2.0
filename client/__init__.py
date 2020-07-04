@@ -3,10 +3,15 @@ import json
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
-s = socket.socket()
-s.bind((HOST, PORT))
-s.listen(5)
+s = ""
 
+def start_socket():
+    global s
+    s = socket.socket()
+    s.bind((HOST, PORT))
+    s.listen(5)
+
+start_socket()
 
 def new_client_or_not(ip):
     # check if ip exit in local db and return IP if yes
@@ -24,16 +29,17 @@ def new_client_or_not(ip):
 def add_new_client_to_db(hub, ip):
     wrong = True
 
-    while wrong == True:
+    while wrong is True:
         col = {}
         c_name = input("Enter Name: ")
         c_type = input("Enter Type: ").upper()
+        print(c_type, c_name)
 
-        if c_type is "T":
+        if c_type =="T":
             # post new data with new tag
             result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=False)
             wrong = False
-        elif c_type is "R" or c_type is "S":
+        elif c_type == "R" or c_type == "S":
             # post new data with new tag
             result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=0)
             wrong = False

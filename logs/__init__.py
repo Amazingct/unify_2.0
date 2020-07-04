@@ -5,10 +5,10 @@ from bugsnag.handlers import BugsnagHandler
 import os
 dir ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0"
-os.chdir(dir)
+
 
 LOG_FORMAT = "/%(levelname)s %(asctime)s - %(message)s"
-logging.basicConfig(filename="logs.log", level=logging.DEBUG, format=LOG_FORMAT)
+logging.basicConfig(filename=dir+"/logs.log", level=logging.DEBUG, format=LOG_FORMAT)
 logger = logging.getLogger()
 
 
@@ -22,10 +22,8 @@ email = ""
 id = ""
 
 
-
-
 def log_cinfig():
-    with open("user.json", "r") as kiosk:
+    with open(dir+"/user.json", "r") as kiosk:
         k = kiosk.read()
         k = json.loads(k)
 

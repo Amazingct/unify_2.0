@@ -2,13 +2,14 @@ import pyrebase
 import json, time
 import client as cl
 import threading as t
-import Gui as gui
 import logs
 from time import sleep
 #  path to configuration files
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
+ready = True
+db_downloaded = False
 
 
 with open(path + "cofig.json") as config_file:
@@ -25,53 +26,6 @@ def update_hub_sensor_data(user, tag):
     return
 
 
-def sign_up():
-    print("CREATE NEW ACCOUNT")
-    email = input("email: ")
-    password = input("password: ")
-    try:
-        user = auth.create_user_with_email_and_password(email, password)
-        print(user["localId"])
-        # create sensor tag with dummy state
-        data = {"IP":"Local_Hub", "Name": "Temperature Sensor", "Type": "S", "State": 0}
-        d = database.child(child).child(user["localId"]).push(data)
-        print(d)
-
-    except Exception as e:
-        print("User exits")
-        print(e)
-
-
-def sign_in():
-
-    try:
-        with open(path + "user.json", "r") as user_file:
-            user = json.loads(user_file.read())
-            print("ID:", user["localId"])
-            gui.email = user["email"]
-            return user
-    except Exception as e:
-        print("Not logged in yet")
-        email = input("email: ")
-        password = input("password: ")
-
-    try:
-        user = auth.sign_in_with_email_and_password(email, password)
-        print("logged in:", user)
-        with open(path + "user.json", "w") as user_file:
-            user_file.write(json.dumps(user))
-            gui.email = user["email"]
-            return user
-    except Exception as e:
-        print("User dose not exit or Wrong password? Create account using Unify App")
-        return None
-
-
-def logout():
-    with open(path+"user.json", "w") as user:
-        user.write("")
-
-
 class Hub:
     global devices
 
@@ -79,26 +33,29 @@ class Hub:
         self.id = user["localId"]
         self.email = user["email"]
         print(self.email)
-        logs.log_cinfig()
 
     def _connection_thread(self):
+        logs.log_cinfig()
+        global ready, db_downloaded
         print("socket started")
         # start socket, create client device object, print out connected device info
         while True:
-            try:
-                conn, addr = cl.start_client_connection()
-                # create client device object and append to devices list
-                devices.append(cl.Client(conn, addr, database, self))
-            except Exception as e:
-                print("Connection:", e)
+            while ready and db_downloaded:
+                try:
+                    conn, addr = cl.start_client_connection()
+                    # create client device object and append to devices list
+                    devices.append(cl.Client(conn, addr, database, self))
+                except Exception as e:
+                    print("Connection:", e)
+                    logs.log(e)
 
     def _sync(self):
         print("sync started")
-
+        global ready, db_downloaded
         while True:
             update = database.child("users").child("Update").get().val()
             # print("Upate is", update)
-            if update is True: # if update is set to true on firebase (data has been modified) then sync
+            if update is True and ready == True: # if update is set to true on firebase (data has been modified) then sync
                 try:
                     read = self.get_all_data()
                     # when it tries to read from fire base and ID has been deleted from firebase read is "None"
@@ -119,6 +76,7 @@ class Hub:
                             })
 
                         self.update_localdb_data(data)
+                        db_downloaded = True
                         # send states to client
 
                         for device in devices:
@@ -128,12 +86,13 @@ class Hub:
                                 print("devices:", e)
                                 device.close()
                                 devices.remove(device)
+                                logs.log(e)
                         # update sensor value on firebase
                         update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
-                        update = False  # after syncing change update to False
                         time.sleep(1)
                 except Exception as e:
                     print("Sync:", e)
+                    logs.log(e)
 
     def start_connection_thread(self):
         t.Thread(target=self._connection_thread).start()
@@ -196,7 +155,13 @@ class Hub:
         rx = database.child(child).child(self.id).push(data)
         return rx
 
+    def close(self):
+        global ready
+        global devices
+        for i in devices:
+            i.close()
+        devices = []
+        ready = False
 
-def start_gui():
-    gui.start_gui()
+
 
