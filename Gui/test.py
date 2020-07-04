@@ -9,7 +9,6 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
-
 user_id = ""
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 child = "users"  # fire-base real-time db child
@@ -44,7 +43,6 @@ class Login(Screen):
             try:
                 user = auth.sign_in_with_email_and_password(self.password.text, self.email.text)
                 print("logged in:", user)
-                user_id = user["localId"]
                 with open(path + "user.json", "w") as user_file:
                     user_file.write(json.dumps(user))
                 wrapper.current = "home"
@@ -63,9 +61,9 @@ class Home(Screen):
 
     def button_action(self, button):
         if button == "logout":
-            wrapper.current = "login"
-            with open(path + "user.json", "w") as user_file:
-                user_file.write("")
+                wrapper.current = "login"
+                with open(path + "user.json", "w") as user_file:
+                    user_file.write("")
 
 
 class Register(Screen):
@@ -94,7 +92,7 @@ class Wrapper(ScreenManager):
 
 
 # load kv file
-sign_in_up = Builder.load_file("unify.kv")
+sign_in_up = Builder.load_file("log_in.kv")
 
 # load screens into Screen Manager
 wrapper = Wrapper()

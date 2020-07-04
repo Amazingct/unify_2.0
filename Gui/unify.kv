@@ -1,0 +1,92 @@
+<Button>:
+    # this will affect all button
+    font_size: 15
+    color:0.3,0.6,0.7,1
+
+<Labels>:
+    font_size: 15
+    size_hint: 20, 5
+
+
+<TextInput>:
+    multiline:False
+    font_size: 15
+    size_hint: 4, 1
+
+
+<Login>:
+    name: "login"
+    password: password
+    email: email
+    user_id: 0
+    FloatLayout:
+        GridLayout:
+            cols: 1
+            size_hint: 0.5, 0.3
+            pos_hint: {"x":0.25,"top":0.5}
+
+            # INSIDE GRID
+            GridLayout:
+                cols: 2
+                Label:
+                    text:"Email: "
+                TextInput:
+                    id:password
+
+                Label:
+                    text:"Password: "
+                TextInput:
+                    id: email
+
+            Button:
+                text:"Login"
+                on_release:root.button_action("login")
+
+            Button:
+                text:"Register"
+                on_release:root.button_action("register")
+
+<Register>:
+    name: "register"
+    password: password
+    r_password: r_password
+    email: email
+    FloatLayout:
+        GridLayout:
+            cols: 1
+            size_hint: 0.5, 0.3
+            pos_hint: {"x":0.25,"top":0.5}
+
+            # INSIDE GRID
+            GridLayout:
+                cols: 2
+                Label:
+                    text:"Email: "
+                TextInput:
+                    id:email
+
+                Label:
+                    text:"Password: "
+                TextInput:
+                    id: password
+                Label:
+                    text:"Password: "
+                TextInput:
+                    id: r_password
+            Button:
+                text:"Submit"
+                on_release: root.button_action("submit")
+
+
+<Home>:
+    name: "home"
+    GridLayout:
+        cols: 2
+        Button:
+            text: "LOGOUT"
+            on_release: root.button_action("logout")
+        Label:
+            text: root.h
+
+
+

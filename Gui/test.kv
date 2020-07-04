@@ -1,0 +1,67 @@
+<Button>
+    # this will affect all button
+    font_size: 15
+    color:0.3,0.6,0.7,1
+    size_hint: 0.3, 0.5
+
+<Login>
+    username: username
+    email: email
+
+    # INSIDE GRID
+    GridLayout:
+        cols: 2
+        Label:
+            text:"Username: "
+        TextInput:
+            id: username
+            multiline:False
+
+        Label:
+            text:"Email: "
+        TextInput:
+            id:email
+            multiline:False
+    Button:
+        pos_hint: {"x":0.2 , "top":1}
+        text:"Sign up"
+        on_press:root.button_pressed("sign_up")
+
+    Button:
+        pos_hint: {"x":0.7 , "top":1}
+        text:"Sign in"
+        on_press:root.button_pressed("sign_in")
+
+<MyGrid>
+    username: username
+    email: email
+
+    # MAIN GRID
+    GridLayout:
+        cols:1
+        size: 400, 200 # use root window size
+
+        # INSIDE GRID
+        GridLayout:
+            cols: 2
+            Label:
+                text:"Username: "
+            TextInput:
+                id: username
+                multiline:False
+
+            Label:
+                text:"Email: "
+            TextInput:
+                id:email
+                multiline:False
+
+        Button:
+            text:"Sign in"
+            font_size: 20
+            on_press:root.button_pressed("sign_in")
+
+        Button:
+            text:"Sign up"
+            font_size: 20
+            on_press:root.button_pressed("sign_up")
