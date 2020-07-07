@@ -1,5 +1,6 @@
 import socket
 import json
+
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
@@ -28,7 +29,6 @@ def new_client_or_not(ip):
 
 def add_new_client_to_db(hub, ip):
     wrong = True
-
     while wrong is True:
         col = {}
         c_name = input("Enter Name: ")
@@ -46,6 +46,7 @@ def add_new_client_to_db(hub, ip):
         else:
             print("Invalid Type (R,T or S)")
             wrong = True
+
     # sync will automatically add to local database
     print(result)
     c_id = result["name"]

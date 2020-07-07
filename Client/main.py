@@ -32,7 +32,7 @@ led([1 ,0 ,0])
 load.value(0)
 
 
-import json
+
 with open("config.txt") as config:
     d = json.loads(config.read())
     HOST = d["hub"]

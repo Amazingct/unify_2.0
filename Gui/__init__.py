@@ -8,6 +8,7 @@ from kivy.uix.button import Label, Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.widget import Widget
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
@@ -46,10 +47,10 @@ class Login(Screen):
     def button_action(self, button):
         global user
         if button == "login":
-            print("user: ", self.password.text, "password:", self.email.text)
+            print("user: ", self.email.text, "password:", self.password.text)
             # sign into database
             try:
-                user = auth.sign_in_with_email_and_password(self.password.text, self.email.text)
+                user = auth.sign_in_with_email_and_password(self.email.text,self.password.text)
                 print("logged in:", user)
                 with open(path + "user.json", "w") as user_file:
                     user_file.write(json.dumps(user))
@@ -97,13 +98,18 @@ class Register(Screen):
 # _____________________________________________________HOME___________________________________________________
 class Home(Screen):
     email = ObjectProperty(None)
+    devices = ObjectProperty(None)
+    response = ObjectProperty(None)
+    hub_temperature = ObjectProperty(None)
 
+    def info_response(self):
+        print("response", self.response.text)
+        self.response.text = ""
+        # add new device
 
     def render(self, state):
         if state == "fresh_login":
             self.email.text = user["email"]
-            # client.s.close()
-            # client.start_socket()
             global hub
             hub.email = user["email"]
             hub.id = user["localId"]
@@ -111,12 +117,13 @@ class Home(Screen):
             hub.start_sync_firebase_clients_localdb_thread()
             hub.start_connection_thread()
             unify.ready = True
-            print(unify.ready)
+
         elif state == "logged_out":
             print("User logged out")
             hub.close()  # reset class
-            # client.s.close()
             unify.ready = False
+        elif state == "state_changed":
+            pass
 
     def button_action(self, button):
         if button == "logout":
@@ -126,19 +133,17 @@ class Home(Screen):
                 user_file.write("")
             self.render("logged_out")
             
-            
+
+# ________________________________________________________________________________________________________________
+# load kv file
+sign_in_up = Builder.load_file(path+"unify.kv")
 
 
-
-
+# load screens into Screen Manager
 class Wrapper(ScreenManager):
     pass
 
 
-# load kv file
-sign_in_up = Builder.load_file(path+"unify.kv")
-
-# load screens into Screen Manager
 wrapper = Wrapper()
 screens = [Login(name="login"), Register(name="register"), Home(name="home")]
 for screen in screens:

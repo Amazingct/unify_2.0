@@ -3,6 +3,7 @@ import json, time
 import client as cl
 import threading as t
 import logs
+
 from time import sleep
 #  path to configuration files
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
@@ -96,6 +97,7 @@ class Hub:
 
     def start_connection_thread(self):
         t.Thread(target=self._connection_thread).start()
+
 
     def __repr__(self):
         return self.id, self.email

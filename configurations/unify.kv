@@ -1,18 +1,12 @@
+# DEFAULT
 <Button>:
-    # this will affect all button
+    color:0.3,0.6,0.7,1
+<Label>:
     font_size: 15
     color:0.3,0.6,0.7,1
-
-<Labels>:
-    font_size: 15
-    size_hint: 20, 5
-
-
-<TextInput>:
-    multiline:False
-    font_size: 15
-    size_hint: 4, 1
-
+# create a new class that inherit from button behavior and Labels(no background)
+<FlatButton@ButtonBehavior+Label>
+    font_size: 16
 
 <Login>:
     name: "login"
@@ -31,12 +25,20 @@
                 Label:
                     text:"Email: "
                 TextInput:
-                    id:password
+                    id:email
+                    multiline:False
+                    font_size: 15
+                    size_hint: 4, 1
 
                 Label:
                     text:"Password: "
                 TextInput:
-                    id: email
+                    id: password
+                    multiline:False
+                    font_size: 15
+                    size_hint: 4, 1
+                    password: True
+                    on_text_validate: root.button_action("login")
 
             Button:
                 text:"Login"
@@ -64,15 +66,26 @@
                     text:"Email: "
                 TextInput:
                     id:email
+                    multiline:False
+                    font_size: 15
+                    size_hint: 4, 1
 
                 Label:
                     text:"Password: "
                 TextInput:
                     id: password
+                    multiline:False
+                    font_size: 15
+                    size_hint: 4, 1
+                    password: True
                 Label:
                     text:"Password: "
                 TextInput:
                     id: r_password
+                    multiline:False
+                    font_size: 15
+                    size_hint: 4, 1
+                    password: True
             Button:
                 text:"Submit"
                 on_release: root.button_action("submit")
@@ -81,16 +94,129 @@
 <Home>:
     name: "home"
     email: email
+    response: response
+    hub_temperature: hub_temperature
     on_pre_enter: root.render("fresh_login")
 
-    GridLayout:
-        cols: 3
-        Button:
-            text: "LOGOUT"
-            on_release: root.button_action("logout")
+
+    BoxLayout:
+        orientation:"vertical"
+        # spacing:10
+        canvas.before:
+            Color:
+                rgba:(1,1,1,1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        #Appbar
+        BoxLayout:
+            size_hint_y:0.09
+            orientation:"horizontal"
+            canvas.before:
+                Color:
+                    rgba:(0.3,0.6,0.7,1)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            FlatButton:
+                color:1,1,1,1
+                size_hint_x: 0.1
+                text: "Menu"
+                bold:True
+            Label:
+                color:1,1,1,1
+                text: "Devices"
+                bold: True
+                size_hint_x: 0.8
+            FlatButton:
+                color:1,1,1,1
+                size_hint_x: 0.1
+                text: "Logout"
+                bold: True
+                on_release: root.button_action("logout")
+        # Main window
         Label:
             id: email
-            text: "hh"
+            text: ""
+            bold: True
+            size_hint_y: 0.07
+
+        BoxLayout:
+            orientation:"vertical"
+            Label:
+                size_hint_y:0.05
+                id: ""
+
+
+            BoxLayout:
+                size_hint_y:0.9
+                orientation:"horizontal"
+                Label:
+                    size_hint_x:0.03
+                    id: ""
+
+                BoxLayout:
+                    size_hint_x:0.40
+                    orientation:"vertical"
+                    size_hint_x:0.40
+                    orientation:"vertical"
+                    canvas.before:
+                        Color:
+                            rgba:(.06,.45,.45,1)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+
+                    # CONNECTED DEVICES
+                    Label:
+                        color:1,1,1,1
+                        size_hint_y:0.07
+                        text: "Connected"
+                        bold:True
+                    Label:
+                        size_hint_y:0.93
+                        text: "Devices"
+
+                Label:
+                    size_hint_x:0.14
+                    id: ""
+
+                BoxLayout:
+                    size_hint_x:0.40
+                    Button:
+                        id: hub_temperature
+                        text: "53"+u'\N{DEGREE SIGN}'+"C"
+                        font_size: 100
+                Label:
+                    size_hint_x:0.03
+                    id: ""
+
+
+            Label:
+                size_hint_y:0.05
+                id: ""
+        # INFO
+        BoxLayout:
+            size_hint_y:0.07
+            orientation:"horizontal"
+            canvas.before:
+                Color:
+                    rgba:(0.3,0.6,0.7,1)
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
+            Label:
+                color:1,1,1,1
+                text: "info"
+                bold: True
+                size_hint_x: 0.9
+            TextInput:
+                id: response
+                size_hint_x: 0.1
+                multiline:False
+                on_text_validate:root.info_response()
+
+
 
 
 
