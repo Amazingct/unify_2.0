@@ -1,1 +1,1 @@
-{"local_hub": {"ID": "-MAxVtweK0ckviC9X3zu", "Name": "Temperature Sensor", "Type": "S", "State": "8 *C"}, "10.42.0.24": {"ID": "-MB-r-73r7tk3nGAdeoU", "Name": "FAN", "Type": "R", "State": 4}}
+{"local_hub": {"ID": "-MAxVtweK0ckviC9X3zu", "Name": "Temperature Sensor", "Type": "S", "State": 32}, "10.42.0.24": {"ID": "-MB-r-73r7tk3nGAdeoU", "Name": "FAN", "Type": "R", "State": 3}, "10.42.0.22": {"ID": "-MBimZiR1Ao8qevskYfP", "Name": "AIR CON", "Type": "T", "State": true}}

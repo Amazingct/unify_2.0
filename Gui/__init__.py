@@ -36,6 +36,7 @@ except Exception as e:
     user = {}
     print(e)
 
+
 class Info(BoxLayout):
     info = ObjectProperty(None)
     yes_button = ObjectProperty(None)
@@ -49,19 +50,52 @@ class Info(BoxLayout):
             rx = "no"
         done = True
 
-def show_popup(title, info):
-    global rx
-    pop = Info()
-    pop.info.text = info
-    popUp = Popup(title=title, content=pop, size_hint=(None, None), size = (400,400), auto_dismiss=False)
-    pop.yes_button.bind(on_press=popUp.dismiss)
-    pop.no_button.bind(on_press=popUp.dismiss)
-    popUp.open()
-    while done != True:
-        pass
-    return rx
 
 
+class Add_new(BoxLayout):
+    info= ObjectProperty(None)
+    add = ObjectProperty(None)
+    cancle = ObjectProperty(None)
+    c_name = ObjectProperty(None)
+    c_type = ObjectProperty(None)
+    def response(self, button):
+        global done
+        global rx
+        if button == "add":
+            rx  = (self.c_name.text, self.c_type.text)
+        if button == "cancle":
+            rx = (None, None)
+        done = True
+
+
+def show_popup(title, info, type):
+
+    global rx, done
+    if type == "add?":
+        pop = Info()
+        pop.info.text = info
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size = (400,400), auto_dismiss=False)
+        pop.yes_button.bind(on_press=popUp.dismiss)
+        pop.no_button.bind(on_press=popUp.dismiss)
+        popUp.open()
+        while done != True:
+            pass
+        done = False
+        return rx
+
+    
+    
+    elif type == "add":
+        pop = Add_new()
+        pop.info.text = info
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(400, 400), auto_dismiss=False)
+        pop.add.bind(on_press=popUp.dismiss)
+        pop.cancle.bind(on_press=popUp.dismiss)
+        popUp.open()
+        while done != True:
+            pass
+        done = False
+        return rx #this will be a tuple instaed (c_name, c_type)
 
 
 

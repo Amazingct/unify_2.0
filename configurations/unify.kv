@@ -33,6 +33,59 @@
             text:"No"
             on_release:root.response("no")
 
+<Add_new>:
+    orientation: "vertical"
+    add:add
+    info:info
+    cancle:cancle
+    c_type:c_type
+    c_name:c_name
+    Label:
+        id:info
+        text: ""
+        size_hint_y:0.1
+    BoxLayout:
+        size_hint_y:0.8
+        orientation: "vertical"
+
+        Label:
+            size_hint_y:0.4
+            text:""
+         # NAME OF DEVICE
+        BoxLayout:
+            size_hint_y:0.1
+            orientation: "horizontal"
+            Label:
+                text: "Name"
+                size_hint_x:0.2
+            TextInput:
+                id: c_name
+                multiline:False
+        # TYPE OF DEVICE
+        BoxLayout:
+            size_hint_y:0.1
+            orientation: "horizontal"
+            Label:
+                text: "Type"
+                size_hint_x:0.2
+            TextInput:
+                id: c_type
+                multiline:False
+        Label:
+            size_hint_y:0.4
+            text:""
+    BoxLayout:
+        size_hint_y:0.1
+        orientation:"horizontal"
+        Button:
+            id: add
+            text:"Add"
+            on_release:root.response("add")
+        Button:
+            id: cancle
+            text:"Cancle"
+            on_release:root.response("cancle")
+
 
 
 
@@ -122,6 +175,7 @@
 <Home>:
     name: "home"
     email: email
+    devices:devices
     hub_temperature: hub_temperature
     on_pre_enter: root.render()
 
@@ -203,19 +257,34 @@
                         text: "Connected"
                         bold:True
                     Label:
+                        color:1,1,1,1
+                        id:devices
                         size_hint_y:0.93
                         text: "Devices"
 
                 Label:
                     size_hint_x:0.14
                     id: ""
-
                 BoxLayout:
+                    orientation: "vertical"
                     size_hint_x:0.40
-                    Button:
-                        id: hub_temperature
-                        text: "53"+u'\N{DEGREE SIGN}'+"C"
-                        font_size: 100
+                    BoxLayout:
+                        size_hint_y:0.5
+                        FlatButton:
+                            size_hint_y:0.5
+                            id: hub_temperature
+                            text: "53"+u'\N{DEGREE SIGN}'+"C"
+                            font_size: 100
+                        Label:
+                            size_hint_y:0.5
+                            text: "Humidity: 12%"
+                            bold: True
+                    Label:
+                        size_hint_y:0.5
+                        text: "Everything seems fine"
+                        bold: True
+
+
                 Label:
                     size_hint_x:0.03
                     id: ""

@@ -2,6 +2,7 @@ import pyrebase
 import json, time
 import client as cl
 
+
 import threading as t
 import logs
 
@@ -23,7 +24,7 @@ database = fire_base.database()
 
 
 def update_hub_sensor_data(user, tag):
-    temperature = "8 *C"
+    temperature = 32
     data = {"State": temperature}
     d = database.child("users").child(user).child(tag).update(data)
     return
@@ -47,7 +48,12 @@ class Hub:
                 try:
                     conn, addr = cl.start_client_connection()
                     # create client device object and append to devices list
-                    devices.append(cl.Client(conn, addr, database, self))
+
+                    new = cl.Client(conn, addr, database, self)
+                    if new.conn != None:
+                        devices.append(new)
+                    else:
+                        print("not added")
                 except Exception as e:
                     print("Connection:", e)
                     logs.log(e)
@@ -85,11 +91,14 @@ class Hub:
                         for device in devices:
                             try:
                                 device.send_to_client(int(data[device.ip]["State"]))
+                                device_list = [device.name, data[device.ip]["State"]]
+                                cl.Gui.home.devices.text = str(device_list)
                             except Exception as e:
                                 print("devices:", e)
                                 device.close()
                                 devices.remove(device)
                                 logs.log(e)
+
                         # update sensor value on firebase
                         update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
                         time.sleep(1)
