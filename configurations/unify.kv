@@ -8,6 +8,34 @@
 <FlatButton@ButtonBehavior+Label>
     font_size: 16
 
+
+
+#info popup
+<Info>:
+    info:info
+    orientation: "vertical"
+    yes_button:yes_button
+    no_button:no_button
+    Label:
+        id:info
+        text: ""
+        size_hint_y:0.9
+
+    BoxLayout:
+        size_hint_y:0.1
+        orientation:"horizontal"
+        Button:
+            id: yes_button
+            text:"yes"
+            on_release:root.response("yes")
+        Button:
+            id: no_button
+            text:"No"
+            on_release:root.response("no")
+
+
+
+
 <Login>:
     name: "login"
     password: password
@@ -94,9 +122,8 @@
 <Home>:
     name: "home"
     email: email
-    response: response
     hub_temperature: hub_temperature
-    on_pre_enter: root.render("fresh_login")
+    on_pre_enter: root.render()
 
 
     BoxLayout:
@@ -122,7 +149,9 @@
                 color:1,1,1,1
                 size_hint_x: 0.1
                 text: "Menu"
+                on_release: root.button_action("f")
                 bold:True
+
             Label:
                 color:1,1,1,1
                 text: "Devices"
@@ -207,14 +236,10 @@
                     pos: self.pos
             Label:
                 color:1,1,1,1
-                text: "info"
+                text: "www.unifyhas.com"
                 bold: True
-                size_hint_x: 0.9
-            TextInput:
-                id: response
-                size_hint_x: 0.1
-                multiline:False
-                on_text_validate:root.info_response()
+
+
 
 
 

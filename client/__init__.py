@@ -1,18 +1,15 @@
 import socket
 import json
+import Gui
 
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
 s = ""
+s = socket.socket()
+s.bind((HOST, PORT))
+s.listen(5)
 
-def start_socket():
-    global s
-    s = socket.socket()
-    s.bind((HOST, PORT))
-    s.listen(5)
-
-start_socket()
 
 def new_client_or_not(ip):
     # check if ip exit in local db and return IP if yes
@@ -71,11 +68,13 @@ class Client:
             self.id = (row["ID"])
             self.type = row["Type"]
             print(self.name, "connected")
+            # print(Gui.show_popup("NEW DEVICE", self.name + " Connected"))
 
         elif neww is True:
             print(addr, "connected")
-            a = input("Do you want to add new client (y/n) ? ")
-            if a == "y":
+            a = Gui.show_popup("NEW DEVICE", "Do you want to add?")
+            # a = input("Do you want to add new client (y/n) ? ")
+            if a == "yes":
                 id, name, ttype = add_new_client_to_db(hub, addr[0])
                 self.name = name
                 self.id = id

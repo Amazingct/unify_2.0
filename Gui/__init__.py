@@ -1,5 +1,4 @@
 from kivy.app import App
-import unify
 import client
 import time
 import threading as t
@@ -9,16 +8,16 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.widget import Widget
+from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
-
+rx = "no"
+done = False
 user = {}
-hub = unify.Hub({"email":"", "localId":""})
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
+path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 child = "users"  # fire-base real-time db child
 
 # get fire_base sdk configuration
@@ -36,6 +35,36 @@ try:
 except Exception as e:
     user = {}
     print(e)
+
+class Info(BoxLayout):
+    info = ObjectProperty(None)
+    yes_button = ObjectProperty(None)
+    no_button = ObjectProperty(None)
+    def response(self, button):
+        global done
+        global rx
+        if button == "yes":
+            rx  = "yes"
+        if button == "no":
+            rx = "no"
+        done = True
+
+def show_popup(title, info):
+    global rx
+    pop = Info()
+    pop.info.text = info
+    popUp = Popup(title=title, content=pop, size_hint=(None, None), size = (400,400), auto_dismiss=False)
+    pop.yes_button.bind(on_press=popUp.dismiss)
+    pop.no_button.bind(on_press=popUp.dismiss)
+    popUp.open()
+    while done != True:
+        pass
+    return rx
+
+
+
+
+
 
 
 # screens classes
@@ -99,31 +128,13 @@ class Register(Screen):
 class Home(Screen):
     email = ObjectProperty(None)
     devices = ObjectProperty(None)
-    response = ObjectProperty(None)
     hub_temperature = ObjectProperty(None)
 
-    def info_response(self):
-        print("response", self.response.text)
-        self.response.text = ""
-        # add new device
+    def render(self):
+        with open(path + "user.json", "r") as user_file:
+            user = json.loads(user_file.read())
+        self.email.text = user["email"]
 
-    def render(self, state):
-        if state == "fresh_login":
-            self.email.text = user["email"]
-            global hub
-            hub.email = user["email"]
-            hub.id = user["localId"]
-            hub.close()  # reset connected devices
-            hub.start_sync_firebase_clients_localdb_thread()
-            hub.start_connection_thread()
-            unify.ready = True
-
-        elif state == "logged_out":
-            print("User logged out")
-            hub.close()  # reset class
-            unify.ready = False
-        elif state == "state_changed":
-            pass
 
     def button_action(self, button):
         if button == "logout":
@@ -131,23 +142,29 @@ class Home(Screen):
             # clear login details
             with open(path + "user.json", "w") as user_file:
                 user_file.write("")
-            self.render("logged_out")
-            
-
+        else:
+            pass
 # ________________________________________________________________________________________________________________
 # load kv file
-sign_in_up = Builder.load_file(path+"unify.kv")
 
 
+Builder.load_file(path+"unify.kv")
 # load screens into Screen Manager
+
+
 class Wrapper(ScreenManager):
     pass
 
 
 wrapper = Wrapper()
-screens = [Login(name="login"), Register(name="register"), Home(name="home")]
-for screen in screens:
-    wrapper.add_widget(screen)
+l = Login(name="login")
+r = Register(name="register")
+home = Home(name="home")
+
+wrapper.add_widget(l)
+wrapper.add_widget(r)
+wrapper.add_widget(home)
+
 
 if user == {}:
     wrapper.current = "login"
@@ -159,5 +176,7 @@ class Unify(App):
     def build(self):
         return wrapper
 
+def start():
+    Unify().run()
 
-Unify().run()
+

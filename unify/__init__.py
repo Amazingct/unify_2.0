@@ -1,15 +1,17 @@
 import pyrebase
 import json, time
 import client as cl
+
 import threading as t
 import logs
 
 from time import sleep
 #  path to configuration files
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2.0/configurations/"
+path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
 ready = True
+hub = None
 db_downloaded = False
 
 
@@ -166,4 +168,22 @@ class Hub:
         ready = False
 
 
+def p():
+    a = True
+    global ready, hub
+    while a:
+        try:
+            with open(path + "user.json", "r") as user_file:
+                user = json.loads(user_file.read())
+                hub =Hub(user)
+                hub.start_connection_thread()
+                hub.start_sync_firebase_clients_localdb_thread()
+                a = False
 
+        except Exception as e:
+            print("yee:", e)
+
+
+t.Thread(target=p).start()
+cl.Gui.start()
+hub.close()
