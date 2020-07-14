@@ -1,5 +1,5 @@
 from kivy.app import App
-import client
+
 import time
 import threading as t
 from time import sleep
@@ -171,7 +171,7 @@ class Home(Screen):
         self.email.text = user["email"]
 
 
-    def button_action(self, button):
+    def button_action( self, button):
         if button == "logout":
             wrapper.current = "login"
             # clear login details
@@ -190,19 +190,14 @@ wrapper = Wrapper()
 l = Login(name="login")
 r = Register(name="register")
 home = Home(name="home")
-
 wrapper.add_widget(l)
 wrapper.add_widget(r)
 wrapper.add_widget(home)
-
-
-
 
 if user == {}:
     wrapper.current = "login"
 else:
     wrapper.current = "home"
-
 
 class Unify(App):
     def build(self):

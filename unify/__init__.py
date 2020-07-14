@@ -14,6 +14,10 @@ hub = None
 db_downloaded = False
 
 
+def change_state(instance):
+    print(instance.id)
+    hub.update_client(instance.id, State=False)
+
 with open(path + "cofig.json") as config_file:
     config = json.loads(config_file.read())
 fire_base = pyrebase.initialize_app(config)
@@ -50,12 +54,13 @@ class Hub:
 
                     new = cl.Client(conn, addr, database, self)
                     if new.conn != None:
+
                         devices.append(new)
                         device_list = [new.name, "Switch"]
                         device_box = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0,40))
                         device_box.add_widget(cl.Gui.Label(text=device_list[0], bold=True, size_hint_x=0.6))
-                        button = cl.Gui.Button(text=str(device_list[1]), bold=True, size_hint_x=0.3)
-                        # b.bind(on_release=cl.Gui.home.change_state(device_list[0]))
+                        button = cl.Gui.Button(id =device_list[0], text=str(device_list[1]), bold=True, size_hint_x=0.3)
+                        button.bind(on_release=change_state)
                         device_box.add_widget(button)
                         cl.Gui.home.devices_box.add_widget(device_box)
 
