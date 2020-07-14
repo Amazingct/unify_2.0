@@ -1,8 +1,6 @@
 import pyrebase
 import json, time
 import client as cl
-
-
 import threading as t
 import logs
 
@@ -40,6 +38,7 @@ class Hub:
 
     def _connection_thread(self):
         logs.log_cinfig()
+        logs.log("hy")
         global ready, db_downloaded
         print("socket started")
         # start socket, create client device object, print out connected device info
@@ -52,6 +51,14 @@ class Hub:
                     new = cl.Client(conn, addr, database, self)
                     if new.conn != None:
                         devices.append(new)
+                        device_list = [new.name, "Switch"]
+                        device_box = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0,40))
+                        device_box.add_widget(cl.Gui.Label(text=device_list[0], bold=True, size_hint_x=0.6))
+                        button = cl.Gui.Button(text=str(device_list[1]), bold=True, size_hint_x=0.3)
+                        # b.bind(on_release=cl.Gui.home.change_state(device_list[0]))
+                        device_box.add_widget(button)
+                        cl.Gui.home.devices_box.add_widget(device_box)
+
                     else:
                         print("not added")
                 except Exception as e:
@@ -73,6 +80,7 @@ class Hub:
 
                     else:
                         # if it exit, proceed to syncing local db
+
                         data = {}
                         for key, val in read.items():
                             data.update({read[key]["IP"]:
@@ -85,14 +93,14 @@ class Hub:
                             })
 
                         self.update_localdb_data(data)
+
                         db_downloaded = True
                         # send states to client
 
                         for device in devices:
+
                             try:
                                 device.send_to_client(int(data[device.ip]["State"]))
-                                device_list = [device.name, data[device.ip]["State"]]
-                                cl.Gui.home.devices.text = str(device_list)
                             except Exception as e:
                                 print("devices:", e)
                                 device.close()
@@ -100,8 +108,9 @@ class Hub:
                                 logs.log(e)
 
                         # update sensor value on firebase
-                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature Sensor")["ID"])
+                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature")["ID"])
                         time.sleep(1)
+
                 except Exception as e:
                     print("Sync:", e)
                     logs.log(e)
@@ -190,7 +199,7 @@ def p():
                 a = False
 
         except Exception as e:
-            print("yee:", e)
+            pass
 
 
 t.Thread(target=p).start()

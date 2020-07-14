@@ -161,8 +161,9 @@ class Register(Screen):
 # _____________________________________________________HOME___________________________________________________
 class Home(Screen):
     email = ObjectProperty(None)
-    devices = ObjectProperty(None)
+    devices_box = ObjectProperty(None)
     hub_temperature = ObjectProperty(None)
+
 
     def render(self):
         with open(path + "user.json", "r") as user_file:
@@ -180,15 +181,10 @@ class Home(Screen):
             pass
 # ________________________________________________________________________________________________________________
 # load kv file
-
-
 Builder.load_file(path+"unify.kv")
 # load screens into Screen Manager
-
-
 class Wrapper(ScreenManager):
     pass
-
 
 wrapper = Wrapper()
 l = Login(name="login")
@@ -198,6 +194,8 @@ home = Home(name="home")
 wrapper.add_widget(l)
 wrapper.add_widget(r)
 wrapper.add_widget(home)
+
+
 
 
 if user == {}:

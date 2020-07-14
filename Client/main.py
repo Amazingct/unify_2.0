@@ -4,7 +4,6 @@ import socket
 import json
 connected = 0
 
-
 g = Pin(14, Pin.OUT)  # d5
 b = Pin(5, Pin.OUT)  # d1
 r = Pin(4, Pin.OUT)  # d2
@@ -17,37 +16,26 @@ def led(color):
     b.value(color[2])
 
 
-# indicate succesful connection and load to main.py
-led([0 ,0 ,0])
-sleep(0.5)
-led([1 ,0 ,0])
-sleep(0.5)
-led([0 ,1 ,0])
-sleep(0.5)
-led([0 ,0 ,1])
-sleep(0.5)
-led([1 ,0 ,0])
-##################################################
 # set load to off
 load.value(0)
-
 
 
 with open("config.txt") as config:
     d = json.loads(config.read())
     HOST = d["hub"]
-    PORT  = d["port"]
+    PORT = d["port"]
+
 s = 0
 
 
 def connect2hub():
-    global connected ,s
+    global connected, s
     print("Connecting to hub")
     try:
         s = socket.socket()
         s.connect((HOST, PORT))
         connected = 1
-        print("Connection succesful")
+        print("Connection successful")
 
         for i in range(2):
             led([0 ,0 ,1])
@@ -61,7 +49,7 @@ def connect2hub():
 
 
 while connected == 0:
-    sleep(2)
+    sleep(5)
     connect2hub()
 
 # if connected proceed

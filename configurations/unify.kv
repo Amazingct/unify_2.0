@@ -4,6 +4,7 @@
 <Label>:
     font_size: 15
     color:0.3,0.6,0.7,1
+
 # create a new class that inherit from button behavior and Labels(no background)
 <FlatButton@ButtonBehavior+Label>
     font_size: 16
@@ -175,7 +176,7 @@
 <Home>:
     name: "home"
     email: email
-    devices:devices
+    devices_box:devices_box
     hub_temperature: hub_temperature
     on_pre_enter: root.render()
 
@@ -252,15 +253,17 @@
 
                     # CONNECTED DEVICES
                     Label:
+                        size_hint_y:0.1
                         color:1,1,1,1
                         size_hint_y:0.07
                         text: "Connected"
                         bold:True
-                    Label:
-                        color:1,1,1,1
-                        id:devices
-                        size_hint_y:0.93
-                        text: "Devices"
+                    BoxLayout:
+                        orientation:"vertical"
+                        id: devices_box
+                        size_hint_y:0.9
+
+
 
                 Label:
                     size_hint_x:0.14

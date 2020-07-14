@@ -18,7 +18,7 @@ r.value(0)
 import json
 with open("config.txt") as config:
     d = json.loads(config.read())
-    password = d["passwprd"]
+    password = d["password"]
     ssid = d["ssid"]
 
 hub = network.WLAN(network.STA_IF)

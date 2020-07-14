@@ -4,7 +4,7 @@ import logging
 from bugsnag.handlers import BugsnagHandler
 import os
 dir ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
-log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2"
+log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/"
 
 
 LOG_FORMAT = "/%(levelname)s %(asctime)s - %(message)s"
@@ -23,7 +23,7 @@ id = ""
 
 
 def log_cinfig():
-    with open(dir+"/user.json", "r") as kiosk:
+    with open(dir+"user.json", "r") as kiosk:
         k = kiosk.read()
         k = json.loads(k)
 
