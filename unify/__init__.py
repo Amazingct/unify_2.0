@@ -9,21 +9,120 @@ from time import sleep
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 child = "users" # fire-base real-time db child
 devices = []
-ready = True
+ready = False
 hub = None
-db_downloaded = False
 
 
-def change_state(instance):
-    print(instance.id)
-    hub.update_client(instance.id, State=False)
+def internet():
+    pass
+    
 
-with open(path + "cofig.json") as config_file:
-    config = json.loads(config_file.read())
-fire_base = pyrebase.initialize_app(config)
-auth = fire_base.auth()
-database = fire_base.database()
+def change_state(device, state, button):
+    global hub
+    if button == "OFF" and state == "down":
+        new_state = False
+        all = hub.get_localdb_data()
+        all[device.ip]["State"] = new_state
+        hub.update_localdb_data(all)
+        device.send_to_client(int(new_state))
 
+    elif button == "ON" and state == "down":
+        new_state = True
+        all = hub.get_localdb_data()
+        all[device.ip]["State"] = new_state
+        hub.update_localdb_data(all)
+        device.send_to_client(int(new_state))
+
+    elif state == "down":
+        pass
+
+    elif button == "+":
+        old_state = hub.get_client_info_from_localdb(device.name)["State"]
+        new_state = old_state + 1
+        if new_state >= 5: new_state = 0
+        elif new_state < 0: new_state = 0
+        all = hub.get_localdb_data()
+        all[device.ip]["State"] = new_state
+        device.send_to_client(int(new_state))
+        hub.update_localdb_data(all)
+        state.text = str(new_state)
+    elif button == "-":
+        old_state = hub.get_client_info_from_localdb(device.name)["State"]
+        new_state = old_state - 1
+        if new_state >= 5: new_state = 0
+        elif new_state < 0: new_state = 0
+        all = hub.get_localdb_data()
+        all[device.ip]["State"] = new_state
+        device.send_to_client(int(new_state))
+        hub.update_localdb_data(all)
+        state.text = str(new_state)
+    try:
+        hub.update_client(device.name, State=new_state)
+    except Exception as e:
+        print("update failed: ", e)
+
+
+
+
+try:
+    with open(path + "cofig.json") as config_file:
+        config = json.loads(config_file.read())
+    fire_base = pyrebase.initialize_app(config)
+    auth = fire_base.auth()
+    database = fire_base.database()
+except Exception as e:
+    print("fire base init:", e)
+
+
+def create_control_interface(new):
+    if new.type == "T":
+        device_list = [new.name, "Switch"]
+        device_box = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
+        device_box.add_widget(cl.Gui.Label(text=device_list[0], bold=True, size_hint_x=0.6))
+        # get current state and send
+        state = hub.get_client_info_from_localdb(new.name)["State"]
+        new.send_to_client(state)
+        switch = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.3, )
+        if state is True:
+            bt_on = cl.Gui.ToggleButton(text='ON', group='switch', state="down", allow_no_selection=False)
+            bt_off = cl.Gui.ToggleButton(text='OFF', group='switch', state="normal", allow_no_selection=False)
+
+        elif state is False:
+            bt_on = cl.Gui.ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False)
+            bt_off = cl.Gui.ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False)
+        callback = lambda _: change_state(new, bt_on.state, bt_on.text)
+        bt_on.bind(on_release=callback)
+        callback = lambda _: change_state(new, bt_off.state, bt_off.text)
+        bt_off.bind(on_release=callback)
+
+        switch.add_widget(bt_off)
+        switch.add_widget(bt_on)
+
+        device_box.add_widget(switch)
+        cl.Gui.home.devices_box.add_widget(device_box)
+    elif new.type == "R":
+        device_list = [new.name, "Switch"]
+        device_box = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
+        device_box.add_widget(cl.Gui.Label(text=device_list[0], bold=True, size_hint_x=0.6))
+        # get current state and send
+        state = hub.get_client_info_from_localdb(new.name)["State"]
+        new.send_to_client(state)
+        switch = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.4, )
+
+        bt_up = cl.Gui.Button(text='+', bold = True)
+        level = cl.Gui.Label(id = "level" ,text=str(state))
+        bt_down = cl.Gui.Button(text='-', bold = True)
+        callback = lambda _: change_state(new, level, bt_up.text)
+        bt_up.bind(on_release=callback)
+        callback = lambda _: change_state(new, level, bt_down.text)
+        bt_down.bind(on_release=callback)
+
+        switch.add_widget(bt_down)
+        switch.add_widget(level)
+        switch.add_widget(bt_up)
+
+        device_box.add_widget(switch)
+        cl.Gui.home.devices_box.add_widget(device_box)
 
 def update_hub_sensor_data(user, tag):
     temperature = 32
@@ -41,84 +140,37 @@ class Hub:
         print(self.email)
 
     def _connection_thread(self):
-        logs.log_cinfig()
-        logs.log("hy")
-        global ready, db_downloaded
+        # logs.log_cinfig()
+        # logs.log("hy")
+        global ready
         print("socket started")
         # start socket, create client device object, print out connected device info
         while True:
-            while ready and db_downloaded:
+            while ready:
                 try:
                     conn, addr = cl.start_client_connection()
                     # create client device object and append to devices list
-
                     new = cl.Client(conn, addr, database, self)
-                    if new.conn != None:
 
+                    if new.conn != None:
                         devices.append(new)
-                        device_list = [new.name, "Switch"]
-                        device_box = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0,40))
-                        device_box.add_widget(cl.Gui.Label(text=device_list[0], bold=True, size_hint_x=0.6))
-                        button = cl.Gui.Button(id =device_list[0], text=str(device_list[1]), bold=True, size_hint_x=0.3)
-                        button.bind(on_release=change_state)
-                        device_box.add_widget(button)
-                        cl.Gui.home.devices_box.add_widget(device_box)
+                        create_control_interface(new)
 
                     else:
                         print("not added")
                 except Exception as e:
                     print("Connection:", e)
-                    logs.log(e)
+                    # logs.log(e)
 
-    def _sync(self):
-        print("sync started")
-        global ready, db_downloaded
-        while True:
-            update = database.child("users").child("Update").get().val()
-            # print("Upate is", update)
-            if update is True and ready == True: # if update is set to true on firebase (data has been modified) then sync
-                try:
-                    read = self.get_all_data()
-                    # when it tries to read from fire base and ID has been deleted from firebase read is "None"
-                    if str(read) == "None":
-                        self.update_localdb_data({})
-
-                    else:
-                        # if it exit, proceed to syncing local db
-
-                        data = {}
-                        for key, val in read.items():
-                            data.update({read[key]["IP"]:
-                                {
-                                    "ID": key,
-                                    "Name": read[key]["Name"],
-                                    "Type": read[key]["Type"],
-                                    "State": read[key]["State"]
-                                }
-                            })
-
-                        self.update_localdb_data(data)
-
-                        db_downloaded = True
-                        # send states to client
-
-                        for device in devices:
-
-                            try:
-                                device.send_to_client(int(data[device.ip]["State"]))
-                            except Exception as e:
-                                print("devices:", e)
-                                device.close()
-                                devices.remove(device)
-                                logs.log(e)
-
-                        # update sensor value on firebase
-                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature")["ID"])
-                        time.sleep(1)
-
-                except Exception as e:
-                    print("Sync:", e)
-                    logs.log(e)
+    def sync(self, device, state):
+        all = self.get_localdb_data()
+        all[device.ip]["State"] = state
+        self.update_localdb_data(all)
+        try:
+            self.update_client(device.name, State=state)
+        except Exception as e:
+            print("update failed: ", e)
+        
 
     def start_connection_thread(self):
         t.Thread(target=self._connection_thread).start()
@@ -147,11 +199,6 @@ class Hub:
             return dict(data)
         else:
             return None
-
-    def start_sync_firebase_clients_localdb_thread(self):
-        """sync local database, clients fire-base"""
-        # start thread
-        t.Thread(target=self._sync).start()
 
     def get_client_info_from_localdb(self, name):
         """takes a client name, checks localdb and return given info(IP, tag, State etc)"""
@@ -192,16 +239,15 @@ class Hub:
 
 
 def p():
-    a = True
     global ready, hub
-    while a:
+    while ready == False:
         try:
             with open(path + "user.json", "r") as user_file:
                 user = json.loads(user_file.read())
                 hub =Hub(user)
                 hub.start_connection_thread()
-                hub.start_sync_firebase_clients_localdb_thread()
-                a = False
+                sleep(3)
+                ready = True
 
         except Exception as e:
             pass

@@ -1,6 +1,7 @@
 from kivy.app import App
-
+from kivy.uix.togglebutton import ToggleButton, ToggleButtonBehavior
 import time
+from kivy.uix.slider import Slider
 import threading as t
 from time import sleep
 from kivy.uix.button import Label, Button
@@ -67,6 +68,10 @@ class Add_new(BoxLayout):
             rx = (None, None)
         done = True
 
+class login_info(BoxLayout):
+    info= ObjectProperty(None)
+
+
 
 def show_popup(title, info, type):
 
@@ -97,6 +102,14 @@ def show_popup(title, info, type):
         done = False
         return rx #this will be a tuple instaed (c_name, c_type)
 
+    elif type == "info":
+        pop = login_info()
+        pop.info.text = info
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(400, 400))
+        popUp.open()
+        return rx #this will be a tuple instaed (c_name, c_type)
+
+
 
 
 
@@ -108,27 +121,29 @@ class Login(Screen):
     r_password = ObjectProperty(None)
 
     def button_action(self, button):
-        global user
-        if button == "login":
-            print("user: ", self.email.text, "password:", self.password.text)
-            # sign into database
-            try:
-                user = auth.sign_in_with_email_and_password(self.email.text,self.password.text)
-                print("logged in:", user)
-                with open(path + "user.json", "w") as user_file:
-                    user_file.write(json.dumps(user))
-                self.password.text = ""
-                self.email.text = ""
-                wrapper.current = "home"
-                
-            except Exception as e:
-                print(e)
-                print("User dose not exit or Wrong password? Create account using Unify App")
-                self.password.text = ""
-                self.email.text = ""
+        def action():
+            global user
+            if button == "login":
+                print("user: ", self.email.text, "password:", self.password.text)
+                # sign into database
+                try:
+                    user = auth.sign_in_with_email_and_password(self.email.text,self.password.text)
+                    print("logged in:", user)
+                    with open(path + "user.json", "w") as user_file:
+                        user_file.write(json.dumps(user))
+                    self.password.text = ""
+                    self.email.text = ""
+                    wrapper.current = "home"
 
-        elif button == "register":
-            wrapper.current = "register"
+                except Exception as e:
+                    print(e)
+                    show_popup("LOGIN", "Oops! Something went wrong.\nCheck Internet and login details","info")
+                    print("User dose not exit or Wrong password? Create account using Unify App")
+
+
+            elif button == "register":
+                wrapper.current = "register"
+        t.Thread(target=action).start()
 
 
 class Register(Screen):
@@ -141,7 +156,7 @@ class Register(Screen):
         try:
             if button == "submit":
                 if len(self.password.text) < 6 or self.password.text != self.r_password.text:
-                    print("Something went wrong")
+                    show_popup("SIGN UP", "Invalid password","info")
                 else:
                     user = auth.create_user_with_email_and_password(self.email.text, self.password.text)
                     print(user["email"])
@@ -154,8 +169,10 @@ class Register(Screen):
                     self.email.text = ""
                     self.r_password.text = ""
                     wrapper.current = "home"
+            elif button == "back_to_login":wrapper.current = "login"
         except Exception as e:
-            print("Invalid email")
+            print(e)
+            show_popup("SIGN UP", "Oops! Something went wrong.\nCheck Internet and signup details","info")
 
 
 # _____________________________________________________HOME___________________________________________________

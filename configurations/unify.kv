@@ -33,6 +33,16 @@
             id: no_button
             text:"No"
             on_release:root.response("no")
+#sign in/log in info popup
+
+<login_info>:
+    info:info
+    orientation: "vertical"
+    Label:
+        id:info
+        text: ""
+
+
 
 <Add_new>:
     orientation: "vertical"
@@ -171,7 +181,9 @@
             Button:
                 text:"Submit"
                 on_release: root.button_action("submit")
-
+            Button:
+                text:"Login"
+                on_release: root.button_action("back_to_login")
 
 <Home>:
     name: "home"

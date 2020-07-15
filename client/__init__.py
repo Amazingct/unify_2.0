@@ -26,32 +26,37 @@ def new_client_or_not(ip):
 
 def add_new_client_to_db(hub, ip):
     col = {}
-    '''
-    c_name = input("Enter Name: ")
-    c_type = input("Enter Type: ").upper()
-    print(c_type, c_name)
-    '''
     c_name , c_type = Gui.show_popup("ADD DEVICE", "Enter name and select type?", "add")
     print(c_type, c_name)
     if c_type == None or c_type == None:
         c_id = None
     else:
-        if c_type =="T":
-            # post new data with new tag
-            result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=False)
-            wrong = False
-        elif c_type == "R" or c_type == "S":
-            # post new data with new tag
-            result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=0)
-            wrong = False
-        # sync will automatically add to local database
-        print(result)
-        c_id = result["name"]
-        # add to local db
-        col.update({ip: {"ID": c_id, "Name": c_name, "Type": c_type, "state": 0}})
+        try:
+            if c_type =="T":
+                state = False
+                # post new data with new tag
+                result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=state)
+                wrong = False
+                print(result)
+                c_id = result["name"]
+            elif c_type == "R" or c_type == "S":
+                state = 0
+                # post new data with new tag
+                result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=state)
+                wrong = False
+                print(result)
+                c_id = result["name"]
+            # add to local db
+            col.update({ip: {"ID": c_id, "Name": c_name, "Type": c_type, "State": state}})
+            all = hub.get_localdb_data()
+            all.update(col)
+            hub.update_localdb_data(all)
+        except Exception as e:
+            print(e)
+            c_id = None
+            Gui.show_popup("ADD new", "Oops! Something went wrong.\nYou need internet to add new device", "info")
+
         # return info
-
-
     return c_id,c_name,c_type
 
 
