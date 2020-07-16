@@ -188,6 +188,8 @@
 <Home>:
     name: "home"
     email: email
+    cloud: cloud
+    local: local
     devices_box:devices_box
     hub_temperature: hub_temperature
     on_pre_enter: root.render()
@@ -231,11 +233,33 @@
                 bold: True
                 on_release: root.button_action("logout")
         # Main window
-        Label:
-            id: email
-            text: ""
-            bold: True
+        BoxLayout:
+            orientation:"horizontal"
             size_hint_y: 0.07
+            Label:
+                id: email
+                text: ""
+                bold: True
+                size_hint_x: 0.96
+            ToggleButton:
+                id: local
+                text: "Local"
+                bold: True
+                color:1,1,1,1
+                group:"int"
+                allow_no_selection:False
+                on_press:root.button_action("local")
+                size_hint_x: 0.07
+            ToggleButton:
+                id: cloud
+                text: "Cloud"
+                bold: True
+                color:1,1,1,1
+                group:"int"
+                allow_no_selection:False
+                on_press:root.button_action("cloud")
+                size_hint_x: 0.07
+
 
         BoxLayout:
             orientation:"vertical"

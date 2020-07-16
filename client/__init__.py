@@ -1,7 +1,8 @@
 import socket
 import json
 import Gui
-
+from time import sleep
+import threading as t
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
@@ -101,9 +102,31 @@ class Client:
     def sense(self):
         return self.conn
 
-    def send_to_client(self, state):
-        self.conn.send(str.encode(str(state)))
-        return str(self.conn.recv(1024), "utf-8")
+    def send_to_client(self, state, remove=None):
+        rxx = None
+        # if it takes more than 3 seconds to receive response from client, it means client has disconnected
+
+        def count():
+            timer = 0
+            while timer < 4:
+                sleep(1)
+                timer = timer+1
+            if rxx == None and remove != None:
+                Gui.home.devices_box.remove_widget(remove)
+                self.conn.close()
+                print(" device closed")
+
+        t.Thread(target=count).start()
+
+
+        try:
+            self.conn.send(str.encode(str(state)))
+            rxx = str(self.conn.recv(1024), "utf-8")
+            return rxx
+        except Exception as e:
+            # print("send", e)
+            self.close()
+            return rxx
 
     def close(self):
         self.conn.close()

@@ -17,49 +17,103 @@ def internet():
     pass
     
 
-def change_state(device, state, button):
-    global hub
-    if button == "OFF" and state == "down":
-        new_state = False
-        all = hub.get_localdb_data()
-        all[device.ip]["State"] = new_state
-        hub.update_localdb_data(all)
-        device.send_to_client(int(new_state))
+def change_state(device, state, button, switch):
 
-    elif button == "ON" and state == "down":
-        new_state = True
-        all = hub.get_localdb_data()
-        all[device.ip]["State"] = new_state
-        hub.update_localdb_data(all)
-        device.send_to_client(int(new_state))
-
-    elif state == "down":
-        pass
-
-    elif button == "+":
-        old_state = hub.get_client_info_from_localdb(device.name)["State"]
-        new_state = old_state + 1
-        if new_state >= 5: new_state = 0
-        elif new_state < 0: new_state = 0
-        all = hub.get_localdb_data()
-        all[device.ip]["State"] = new_state
-        device.send_to_client(int(new_state))
-        hub.update_localdb_data(all)
-        state.text = str(new_state)
-    elif button == "-":
-        old_state = hub.get_client_info_from_localdb(device.name)["State"]
-        new_state = old_state - 1
-        if new_state >= 5: new_state = 0
-        elif new_state < 0: new_state = 0
-        all = hub.get_localdb_data()
-        all[device.ip]["State"] = new_state
-        device.send_to_client(int(new_state))
-        hub.update_localdb_data(all)
-        state.text = str(new_state)
     try:
-        hub.update_client(device.name, State=new_state)
-    except Exception as e:
-        print("update failed: ", e)
+        button = button.text
+    except:
+        button = button
+
+    def changing():
+        global hub, ready
+        # stop syncing
+        ready = False
+        if button == "OFF" and state == "down":
+            new_state = False
+            all = hub.get_localdb_data()
+            all[device.ip]["State"] = new_state
+            try:
+                device.send_to_client(int(new_state), switch)
+                hub.update_localdb_data(all)
+            except Exception as e:
+                print("send", e)
+
+            try:
+                hub.update_client(device.name, State=new_state)
+                ready = True
+            except Exception as e:
+                print("update failed: no internet")
+                ready = True
+
+        elif button == "ON" and state == "down":
+            new_state = True
+            all = hub.get_localdb_data()
+            all[device.ip]["State"] = new_state
+
+            try:
+                device.send_to_client(int(new_state), switch)
+                hub.update_localdb_data(all)
+            except Exception as e:
+                print("send", e)
+
+            try:
+                hub.update_client(device.name, State=new_state)
+                ready = True
+            except Exception as e:
+                print("update failed: no internet")
+                ready = True
+
+        elif state == "down":
+            ready = True
+
+        elif button == "+":
+            old_state = hub.get_client_info_from_localdb(device.name)["State"]
+            new_state = old_state + 1
+            if new_state >= 5: new_state = 0
+            elif new_state < 0: new_state = 0
+            all = hub.get_localdb_data()
+            all[device.ip]["State"] = new_state
+            try:
+                device.send_to_client(int(new_state), switch)
+                hub.update_localdb_data(all)
+            except Exception as e:
+                print("send", e)
+
+            state.text = str(new_state)
+            try:
+                hub.update_client(device.name, State=new_state)
+                ready = True
+            except Exception as e:
+                print("update failed: no internet")
+                ready = True
+        elif button == "-":
+            old_state = hub.get_client_info_from_localdb(device.name)["State"]
+            new_state = old_state - 1
+            if new_state >= 5: new_state = 0
+            elif new_state < 0: new_state = 0
+            all = hub.get_localdb_data()
+            all[device.ip]["State"] = new_state
+            try:
+                device.send_to_client(int(new_state), switch)
+                hub.update_localdb_data(all)
+            except Exception as e:
+                print("send", e)
+            state.text = str(new_state)
+            try:
+                hub.update_client(device.name, State=new_state)
+                ready = True
+            except Exception as e:
+                print("update failed: no internet")
+                ready = True
+        elif button == "sync":
+            all = hub.get_localdb_data()
+            all[device.ip]["State"] = state
+            device.send_to_client(int(state))
+            ready = True
+        ready = True
+    t.Thread(target=changing).start()
+
+
 
 
 
@@ -82,7 +136,7 @@ def create_control_interface(new):
         # get current state and send
         state = hub.get_client_info_from_localdb(new.name)["State"]
         new.send_to_client(state)
-        switch = cl.Gui.BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.3, )
+        switch = cl.Gui.BoxLayout(id =new.ip,orientation="horizontal", spacing=0.3, size_hint_x=0.3, )
         if state is True:
             bt_on = cl.Gui.ToggleButton(text='ON', group='switch', state="down", allow_no_selection=False)
             bt_off = cl.Gui.ToggleButton(text='OFF', group='switch', state="normal", allow_no_selection=False)
@@ -90,9 +144,9 @@ def create_control_interface(new):
         elif state is False:
             bt_on = cl.Gui.ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False)
             bt_off = cl.Gui.ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False)
-        callback = lambda _: change_state(new, bt_on.state, bt_on.text)
+        callback = lambda _: change_state(new, bt_on.state, bt_on, device_box)
         bt_on.bind(on_release=callback)
-        callback = lambda _: change_state(new, bt_off.state, bt_off.text)
+        callback = lambda _: change_state(new, bt_off.state, bt_off, device_box)
         bt_off.bind(on_release=callback)
 
         switch.add_widget(bt_off)
@@ -128,7 +182,8 @@ def update_hub_sensor_data(user, tag):
     temperature = 32
     data = {"State": temperature}
     d = database.child("users").child(user).child(tag).update(data)
-    return
+    # update on local too
+
 
 
 class Hub:
@@ -153,8 +208,21 @@ class Hub:
                     new = cl.Client(conn, addr, database, self)
 
                     if new.conn != None:
+                        '''
+                        interface_exit = False
+                        for device in devices:
+                            if device.ip == new.ip:
+                                interface_exit = True
+                                break
+                        if interface_exit:
+                            devices.append(new)
+                        else:
+                            devices.append(new)
+                            create_control_interface(new)
+                        '''
                         devices.append(new)
                         create_control_interface(new)
+
 
                     else:
                         print("not added")
@@ -162,19 +230,59 @@ class Hub:
                     print("Connection:", e)
                     # logs.log(e)
 
-    def sync(self, device, state):
-        all = self.get_localdb_data()
-        all[device.ip]["State"] = state
-        self.update_localdb_data(all)
-        try:
-            self.update_client(device.name, State=state)
-        except Exception as e:
-            print("update failed: ", e)
-        
+    def _sync(self):
+        print("sync started")
+        global ready
+        while True:
+            # if ready is true and connection is set to cloud, start syncing cloud db to local db
+            if ready and cl.Gui.connection == "cloud":
+                try:
+                    read = self.get_all_data()
+                    # when it tries to read from fire base and ID has been deleted from firebase read is "None"
+                    if str(read) == "None":
+                        self.update_localdb_data({})
+
+                    else:
+                        # if it exit, proceed to syncing local db
+
+                        data = {}
+                        for key, val in read.items():
+                            data.update({read[key]["IP"]:
+                                {
+                                    "ID": key,
+                                    "Name": read[key]["Name"],
+                                    "Type": read[key]["Type"],
+                                    "State": read[key]["State"]
+                                }
+                            })
+
+                        self.update_localdb_data(data)
+
+                        # send states to client
+
+                        for device in devices:
+
+                            try:
+                                change_state(device, data[device.ip]["State"], "sync", "_")
+                            except Exception as e:
+                                print("devices:", e)
+                                device.close()
+                                devices.remove(device)
+                                # logs.log(e)
+
+                        # update sensor value on firebase
+                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature")["ID"])
+                        time.sleep(1)
+
+                except Exception as e:
+                    print("Sync:", e)
+                    #logs.log(e)
 
     def start_connection_thread(self):
         t.Thread(target=self._connection_thread).start()
 
+    def start_sync_thread(self):
+        t.Thread(target=self._sync).start()
 
     def __repr__(self):
         return self.id, self.email
@@ -191,7 +299,6 @@ class Hub:
         with open(path + "db.json", "w") as db:
             db.write(json.dumps(data))
             return True
-
 
     def get_all_data(self):
         data = database.child("users").child(self.id).get().val()
@@ -246,7 +353,8 @@ def p():
                 user = json.loads(user_file.read())
                 hub =Hub(user)
                 hub.start_connection_thread()
-                sleep(3)
+                hub.start_sync_thread()
+                sleep(2)
                 ready = True
 
         except Exception as e:

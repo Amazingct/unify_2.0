@@ -15,6 +15,8 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
+import  urllib
+connection = "cloud"
 rx = "no"
 done = False
 user = {}
@@ -36,6 +38,17 @@ try:
 except Exception as e:
     user = {}
     print(e)
+
+
+def connected_to_internet(host="https://google.com"):
+    try:
+        urllib.request.urlopen(host)
+        print("Internet available")
+        return True
+    except Exception as e:
+        print("internet:", e)
+        print("internet Unavailable")
+        return False
 
 
 class Info(BoxLayout):
@@ -133,8 +146,22 @@ class Login(Screen):
                         user_file.write(json.dumps(user))
                     self.password.text = ""
                     self.email.text = ""
+                    #download db from firebase
+                    read = database.child("users").child(user["localId"]).get().val()
+                    # re -arrange
+                    data = {}
+                    for key, val in read.items():
+                        data.update({read[key]["IP"]:
+                            {
+                                "ID": key,
+                                "Name": read[key]["Name"],
+                                "Type": read[key]["Type"],
+                                "State": read[key]["State"]
+                            }
+                        })
+                    with open(path+"db.json", "w") as db:
+                        db.write(json.dumps(data))
                     wrapper.current = "home"
-
                 except Exception as e:
                     print(e)
                     show_popup("LOGIN", "Oops! Something went wrong.\nCheck Internet and login details","info")
@@ -161,8 +188,22 @@ class Register(Screen):
                     user = auth.create_user_with_email_and_password(self.email.text, self.password.text)
                     print(user["email"])
                     # create sensor tag with dummy state
-                    data = {"IP": "Local_Hub", "Name": "Temperature Sensor", "Type": "S", "State": 0}
+                    data = {"IP": "Local_Hub", "Name": "Temperature", "Type": "S", "State": 0}
+                    # add to cloud
                     rx = database.child(child).child(user["localId"]).push(data)
+                    # add locally
+                    data_c = {}
+                    data_c.update({data["IP"]:
+                        {
+                            "ID": rx["name"],
+                            "Name": data["Name"],
+                            "Type": data["Type"],
+                            "State": data["State"]
+                        }
+                    })
+                    with open(path + "db.json", "w") as db:
+                        db.write(json.dumps(data_c))
+
                     with open(path + "user.json", "w") as user_file:
                         user_file.write(json.dumps(user))
                     self.password.text = ""
@@ -180,20 +221,67 @@ class Home(Screen):
     email = ObjectProperty(None)
     devices_box = ObjectProperty(None)
     hub_temperature = ObjectProperty(None)
+    cloud = ObjectProperty(None)
+    local = ObjectProperty(None)
+
+
 
 
     def render(self):
+        global connection
         with open(path + "user.json", "r") as user_file:
             user = json.loads(user_file.read())
         self.email.text = user["email"]
 
+        # toggle connection
+        if connected_to_internet()==True:
+            connection = "cloud"
+            self.cloud.state = "down"
+            self.local.state = "normal"
+            # update local db
+            # download db from firebase
+            read = database.child("users").child(user["localId"]).get().val()
+            # re -arrange
+            data = {}
+            for key, val in read.items():
+                data.update({read[key]["IP"]:
+                    {
+                        "ID": key,
+                        "Name": read[key]["Name"],
+                        "Type": read[key]["Type"],
+                        "State": read[key]["State"]
+                    }
+                })
+            with open(path + "db.json", "w") as db:
+                db.write(json.dumps(data))
+
+
+        else:
+            connection = "local"
+            self.local.state = "down"
+            self.cloud.state = "normal"
+
+
 
     def button_action( self, button):
+        global connection
         if button == "logout":
             wrapper.current = "login"
             # clear login details
             with open(path + "user.json", "w") as user_file:
                 user_file.write("")
+        elif button == "local":
+            connection = "local"
+            print(connection)
+        elif button == "cloud":
+            if connected_to_internet():
+                connection = "cloud"
+                print(connection)
+            else:
+                show_popup("NO INTERNET", "you cant switch to cloud mode.\nEnsure you have inernet connection", "info")
+                self.local.state = "down"
+                self.cloud.state = "normal"
+
         else:
             pass
 # ________________________________________________________________________________________________________________
