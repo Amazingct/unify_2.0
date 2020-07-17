@@ -16,6 +16,29 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
 import  urllib
+
+class loading(Screen):
+    pass
+
+load = loading(name="load")
+unify = Label(color=(1,1,1,1), text= "UNIFY...",bold= True,font_size=90)
+box = BoxLayout()
+box.add_widget(unify)
+load.add_widget(box)
+
+
+# load screens into Screen Manager
+class Wrapper(ScreenManager):
+    pass
+wrapper = Wrapper()
+wrapper.add_widget(load)
+wrapper.current = "load"
+
+
+
+
+
+hub_sensor = {"humidity":'0', "temperature":'0'}
 connection = "cloud"
 rx = "no"
 done = False
@@ -49,6 +72,59 @@ def connected_to_internet(host="https://google.com"):
         print("internet:", e)
         print("internet Unavailable")
         return False
+
+
+
+class device_control:
+     def __init__(self,client,state,change_state_function):
+        self.type = client.type
+        self.state = state
+        self.change_state = change_state_function
+        if client.type == "T":
+            device_list = [client.name, "Switch"]
+            device_box = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
+            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.6))
+            client.send_to_client(state)
+            switch = BoxLayout(id=client.ip, orientation="horizontal", spacing=0.3, size_hint_x=0.3, )
+            if state is True:
+                bt_on = ToggleButton(text='ON', group='switch', state="down", allow_no_selection=False)
+                bt_off = ToggleButton(text='OFF', group='switch', state="normal", allow_no_selection=False)
+
+            elif state is False:
+                bt_on = ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False)
+                bt_off = ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False)
+            callback = lambda _: self.change_state(client, bt_on.state, bt_on, device_box)
+            bt_on.bind(on_release=callback)
+            callback = lambda _: self.change_state(client, bt_off.state, bt_off, device_box)
+            bt_off.bind(on_release=callback)
+
+            switch.add_widget(bt_off)
+            switch.add_widget(bt_on)
+
+            device_box.add_widget(switch)
+            return device_box
+
+        elif client.type == "R":
+            device_list = [client.name, "Switch"]
+            device_box = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
+            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.6))
+            client.send_to_client(state)
+            switch = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.4, )
+
+            bt_up = Button(text='+', bold=True)
+            level = Label(id="level", text=str(state))
+            bt_down = Button(text='-', bold=True)
+            callback = lambda _: self.change_state(client, level, bt_up.text)
+            bt_up.bind(on_release=callback)
+            callback = lambda _: self.change_state(client, level, bt_down.text)
+            bt_down.bind(on_release=callback)
+
+            switch.add_widget(bt_down)
+            switch.add_widget(level)
+            switch.add_widget(bt_up)
+
+            device_box.add_widget(switch)
+            return device_box
 
 
 class Info(BoxLayout):
@@ -125,8 +201,6 @@ def show_popup(title, info, type):
 
 
 
-
-
 # screens classes
 class Login(Screen):
     password = ObjectProperty(None)
@@ -171,7 +245,6 @@ class Login(Screen):
             elif button == "register":
                 wrapper.current = "register"
         t.Thread(target=action).start()
-
 
 class Register(Screen):
     password = ObjectProperty(None)
@@ -220,14 +293,19 @@ class Register(Screen):
 class Home(Screen):
     email = ObjectProperty(None)
     devices_box = ObjectProperty(None)
+    hub_humidity = ObjectProperty(None)
     hub_temperature = ObjectProperty(None)
     cloud = ObjectProperty(None)
     local = ObjectProperty(None)
 
-
-
+    def refresh(self):
+        global hub_sensor
+        print("getting....")
+        self.hub_temperature.text = hub_sensor["temperature"] + u'\N{DEGREE SIGN}'+"C"
+        self.hub_humidity.text = "Humidity " + hub_sensor["humidity"] + "%"
 
     def render(self):
+        #t.Thread(target=self.refresh).start()
         global connection
         with open(path + "user.json", "r") as user_file:
             user = json.loads(user_file.read())
@@ -256,11 +334,12 @@ class Home(Screen):
                 db.write(json.dumps(data))
 
 
+
         else:
             connection = "local"
             self.local.state = "down"
             self.cloud.state = "normal"
-
+        # wrapper.current = "home"
 
 
     def button_action( self, button):
@@ -274,24 +353,23 @@ class Home(Screen):
             connection = "local"
             print(connection)
         elif button == "cloud":
-            if connected_to_internet():
-                connection = "cloud"
-                print(connection)
-            else:
-                show_popup("NO INTERNET", "you cant switch to cloud mode.\nEnsure you have inernet connection", "info")
-                self.local.state = "down"
-                self.cloud.state = "normal"
+            # start a thread
+            def cloud():
+                if connected_to_internet():
+                    connection = "cloud"
+                    print(connection)
+                else:
+                    show_popup("NO INTERNET", "you cant switch to cloud mode.\nEnsure you have inernet connection", "info")
+                    self.local.state = "down"
+                    self.cloud.state = "normal"
+            t.Thread(target=cloud).start()
 
         else:
             pass
 # ________________________________________________________________________________________________________________
 # load kv file
 Builder.load_file(path+"unify.kv")
-# load screens into Screen Manager
-class Wrapper(ScreenManager):
-    pass
 
-wrapper = Wrapper()
 l = Login(name="login")
 r = Register(name="register")
 home = Home(name="home")

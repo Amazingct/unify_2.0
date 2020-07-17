@@ -10,6 +10,9 @@ s = ""
 s = socket.socket()
 s.bind((HOST, PORT))
 s.listen(5)
+devices = []
+
+
 
 
 def new_client_or_not(ip):
@@ -99,8 +102,6 @@ class Client:
                     self.ip = addr[0]
             else:
                 pass
-    def sense(self):
-        return self.conn
 
     def send_to_client(self, state, remove=None):
         rxx = None
@@ -114,6 +115,7 @@ class Client:
             if rxx == None and remove != None:
                 Gui.home.devices_box.remove_widget(remove)
                 self.conn.close()
+                devices.remove(self)
                 print(" device closed")
 
         t.Thread(target=count).start()

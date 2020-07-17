@@ -192,6 +192,7 @@
     local: local
     devices_box:devices_box
     hub_temperature: hub_temperature
+    hub_humidity: hub_humidity
     on_pre_enter: root.render()
 
 
@@ -312,9 +313,10 @@
                         FlatButton:
                             size_hint_y:0.5
                             id: hub_temperature
-                            text: "53"+u'\N{DEGREE SIGN}'+"C"
+                            text: "0"+u'\N{DEGREE SIGN}'+"C"
                             font_size: 100
                         Label:
+                            id:hub_humidity
                             size_hint_y:0.5
                             text: "Humidity: 12%"
                             bold: True

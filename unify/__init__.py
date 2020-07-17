@@ -3,22 +3,17 @@ import json, time
 import client as cl
 import threading as t
 import logs
+from random import randint
 
 from time import sleep
 #  path to configuration files
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 child = "users" # fire-base real-time db child
-devices = []
 ready = False
 hub = None
 
 
-def internet():
-    pass
-    
-
 def change_state(device, state, button, switch):
-
     try:
         button = button.text
     except:
@@ -179,15 +174,20 @@ def create_control_interface(new):
         cl.Gui.home.devices_box.add_widget(device_box)
 
 def update_hub_sensor_data(user, tag):
-    temperature = 32
+    temperature = randint(20,37) #get from sensor
+    humidity = 56
     data = {"State": temperature}
-    d = database.child("users").child(user).child(tag).update(data)
+    cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"
+    cl.Gui.home.hub_humidity.text = "Humidity " + str(humidity) + "%"
+    try:
+        d = database.child("users").child(user).child(tag).update(data)
+    except:
+        pass
     # update on local too
 
 
 
 class Hub:
-    global devices
 
     def __init__(self, user):
         self.id = user["localId"]
@@ -204,23 +204,23 @@ class Hub:
             while ready:
                 try:
                     conn, addr = cl.start_client_connection()
-                    # create client device object and append to devices list
+                    # create client device object and append to cl.devices list
                     new = cl.Client(conn, addr, database, self)
 
                     if new.conn != None:
                         '''
                         interface_exit = False
-                        for device in devices:
+                        for device in cl.devices:
                             if device.ip == new.ip:
                                 interface_exit = True
                                 break
                         if interface_exit:
-                            devices.append(new)
+                            cl.devices.append(new)
                         else:
-                            devices.append(new)
+                            cl.devices.append(new)
                             create_control_interface(new)
                         '''
-                        devices.append(new)
+                        cl.devices.append(new)
                         create_control_interface(new)
 
 
@@ -255,19 +255,15 @@ class Hub:
                                     "State": read[key]["State"]
                                 }
                             })
-
                         self.update_localdb_data(data)
-
                         # send states to client
-
-                        for device in devices:
-
+                        for device in cl.devices:
                             try:
                                 change_state(device, data[device.ip]["State"], "sync", "_")
                             except Exception as e:
-                                print("devices:", e)
+                                print("cl.devices:", e)
                                 device.close()
-                                devices.remove(device)
+                                cl.devices.remove(device)
                                 # logs.log(e)
 
                         # update sensor value on firebase
@@ -292,7 +288,7 @@ class Hub:
             with open(path + "db.json", "r") as db:
                 return json.loads(db.read())
         except Exception as e:
-            print("Error reading local database")
+            print("Error reading local database", e)
             return None
 
     def update_localdb_data(self, data):
@@ -338,10 +334,9 @@ class Hub:
 
     def close(self):
         global ready
-        global devices
-        for i in devices:
+        for i in cl.devices:
             i.close()
-        devices = []
+        cl.devices = []
         ready = False
 
 
