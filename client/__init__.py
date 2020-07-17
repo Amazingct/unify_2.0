@@ -74,6 +74,7 @@ class Client:
     def __init__(self, conn, addr, database, hub):
         # check if connected device is new or not
         self.conn = None
+        self.control = None
         neww, row = new_client_or_not(addr[0])
         if neww is False:
             self.name = (row["Name"])
@@ -113,7 +114,7 @@ class Client:
                 sleep(1)
                 timer = timer+1
             if rxx == None and remove != None:
-                Gui.home.devices_box.remove_widget(remove)
+                # Gui.home.devices_box.remove_widget(remove)
                 self.conn.close()
                 devices.remove(self)
                 print(" device closed")

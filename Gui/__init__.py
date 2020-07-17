@@ -16,6 +16,13 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
 import  urllib
+hub_sensor = {"humidity":'0', "temperature":'0'}
+connection = "cloud"
+rx = "no"
+done = False
+user = {}
+path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
+child = "users"  # fire-base real-time db child
 
 class loading(Screen):
     pass
@@ -34,17 +41,6 @@ wrapper = Wrapper()
 wrapper.add_widget(load)
 wrapper.current = "load"
 
-
-
-
-
-hub_sensor = {"humidity":'0', "temperature":'0'}
-connection = "cloud"
-rx = "no"
-done = False
-user = {}
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
-child = "users"  # fire-base real-time db child
 
 # get fire_base sdk configuration
 with open(path + "cofig.json") as config_file:
@@ -94,15 +90,16 @@ class device_control:
                 bt_on = ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False)
                 bt_off = ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False)
             callback = lambda _: self.change_state(client, bt_on.state, bt_on, device_box)
-            bt_on.bind(on_release=callback)
+            bt_on.bind(on_press=callback)
             callback = lambda _: self.change_state(client, bt_off.state, bt_off, device_box)
-            bt_off.bind(on_release=callback)
+            bt_off.bind(on_press=callback)
 
-            switch.add_widget(bt_off)
-            switch.add_widget(bt_on)
+            self.bt_on = bt_on
+            self.bt_off = bt_off
+            switch.add_widget(self.bt_off)
+            switch.add_widget(self.bt_on)
 
-            device_box.add_widget(switch)
-            return device_box
+
 
         elif client.type == "R":
             device_list = [client.name, "Switch"]
@@ -114,17 +111,21 @@ class device_control:
             bt_up = Button(text='+', bold=True)
             level = Label(id="level", text=str(state))
             bt_down = Button(text='-', bold=True)
-            callback = lambda _: self.change_state(client, level, bt_up.text)
-            bt_up.bind(on_release=callback)
-            callback = lambda _: self.change_state(client, level, bt_down.text)
-            bt_down.bind(on_release=callback)
+            callback = lambda _: self.change_state(client, level, bt_up.text, device_box)
+            bt_up.bind(on_press=callback)
+            callback = lambda _: self.change_state(client, level, bt_down.text, device_box)
+            bt_down.bind(on_press=callback)
 
+
+            self.level = level
             switch.add_widget(bt_down)
-            switch.add_widget(level)
+            switch.add_widget(self.level)
             switch.add_widget(bt_up)
 
-            device_box.add_widget(switch)
-            return device_box
+
+        device_box.add_widget(switch)
+        self.device_box = device_box
+        home.devices_box.add_widget(self.device_box)
 
 
 class Info(BoxLayout):
@@ -318,6 +319,7 @@ class Home(Screen):
             self.local.state = "normal"
             # update local db
             # download db from firebase
+
             read = database.child("users").child(user["localId"]).get().val()
             # re -arrange
             data = {}
@@ -355,6 +357,7 @@ class Home(Screen):
         elif button == "cloud":
             # start a thread
             def cloud():
+                global connection
                 if connected_to_internet():
                     connection = "cloud"
                     print(connection)
