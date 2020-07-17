@@ -70,7 +70,8 @@ def change_state(device, state, button, switch):
 
         # update database
         try:
-            hub.update_client(device.name, State=new_state)
+            if cl.Gui.connection == "cloud":
+                hub.update_client(device.name, State=new_state)
         except Exception as e:
             print("update failed: no internet")
         ready = True
@@ -93,17 +94,21 @@ except Exception as e:
 
 
 
-def update_hub_sensor_data(user, tag):
-    temperature = randint(20,37) #get from sensor
-    humidity = 56
-    data = {"State": temperature}
-    cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"
-    cl.Gui.home.hub_humidity.text = "Humidity " + str(humidity) + "%"
-    try:
-        d = database.child("users").child(user).child(tag).update(data)
-    except:
-        pass
-    # update on local too
+def update_hub_sensor_data():
+    global hub
+    while 1:
+        sleep(2)
+        temperature = randint(20,37) #get from sensor
+        humidity = 56
+        data = {"State": temperature}
+        cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"
+        cl.Gui.home.hub_humidity.text = "Humidity " + str(humidity) + "%"
+        try:
+            if cl.Gui.connection == "cloud":
+                d = database.child("users").child(hub.id).child(hub.get_client_info_from_localdb("Temperature")["ID"]).update(data)
+        except:
+            pass
+
 
 
 
@@ -192,8 +197,6 @@ class Hub:
                                 cl.devices.remove(device)
                                 # logs.log(e)
 
-                        # update sensor value on firebase
-                        update_hub_sensor_data(self.id, self.get_client_info_from_localdb("Temperature")["ID"])
 
 
                 except Exception as e:
@@ -267,6 +270,7 @@ class Hub:
 
 
 def p():
+    global update_hub_sensor_data
     global ready, hub
     while ready == False:
         try:
@@ -277,6 +281,7 @@ def p():
                 hub.start_sync_thread()
                 sleep(2)
                 ready = True
+                t.Thread(target=update_hub_sensor_data).start()
 
         except Exception as e:
             pass
