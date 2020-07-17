@@ -286,7 +286,7 @@ def p():
         except Exception as e:
             pass
 
-
-t.Thread(target=p).start()
-cl.Gui.start()
-hub.close()
+def start():
+    t.Thread(target=p).start()
+    cl.Gui.start()
+    hub.close()
