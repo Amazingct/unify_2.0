@@ -45,6 +45,7 @@ def change_state(device, state, button, switch):
             elif new_state < 0: new_state = 0
             all = hub.get_localdb_data()
             all[device.ip]["State"] = new_state
+            state.text = str(new_state)
 
 
         elif button == "-":
@@ -134,17 +135,24 @@ class Hub:
 
                     if new.conn != None:
                         # if device has been previously added
+                        print("new:", new.ip)
+
                         for device in cl.devices:
+
+                            print("conected before:", device.ip)
                             if device.ip == new.ip:
                                 #remove control
+                                print("reseting control....")
                                 cl.Gui.home.devices_box.remove_widget(device.control.device_box)
                                 device.close()
-                                break
+                                print("reset done!")
+
                         #add control
                         cl.devices.append(new)
                         cl.devices[-1].control = cl.Gui.device_control(cl.devices[-1],
                                                                     hub.get_client_info_from_localdb(cl.devices[-1].name)["State"],
                                                                     change_state)
+
 
                     else:
                         print("not added")
@@ -182,7 +190,6 @@ class Hub:
                         # send states to client
                         for device in cl.devices:
                             try:
-                               # change_state(device, data[device.ip]["State"], "sync", "_")
                                 device.send_to_client(int(data[device.ip]["State"]))
                                 if data[device.ip]["State"] == True and device.type == "T":
                                     device.control.bt_on.state = "down"; device.control.bt_off.state = "normal"
@@ -192,9 +199,8 @@ class Hub:
                                     device.control.level.text = str(data[device.ip]["State"])
 
                             except Exception as e:
-                                print("cl.devices:", e)
-                                device.close()
-                                cl.devices.remove(device)
+                                print("sync send to client:", e)
+                                device.conn.close()
                                 # logs.log(e)
 
 
@@ -289,4 +295,4 @@ def p():
 def start():
     t.Thread(target=p).start()
     cl.Gui.start()
-    hub.close()
+    #hub.close()

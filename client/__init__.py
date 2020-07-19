@@ -6,14 +6,21 @@ import threading as t
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
-s = ""
-s = socket.socket()
-s.bind((HOST, PORT))
+
+
+def bind():
+    global s
+    s = socket.socket()
+    s.bind((HOST, PORT))
+try:
+    bind()
+except:
+    s.close()
+    sleep(3)
+    bind()
+
 s.listen(5)
 devices = []
-
-
-
 
 def new_client_or_not(ip):
     # check if ip exit in local db and return IP if yes
@@ -114,9 +121,7 @@ class Client:
                 sleep(1)
                 timer = timer+1
             if rxx == None and remove != None:
-                # Gui.home.devices_box.remove_widget(remove)
                 self.conn.close()
-                devices.remove(self)
                 print(" device closed")
 
         t.Thread(target=count).start()
@@ -132,5 +137,7 @@ class Client:
             return rxx
 
     def close(self):
+        global devices
         self.conn.close()
+        devices.remove(self)
 

@@ -79,16 +79,16 @@ class device_control:
         if client.type == "T":
             device_list = [client.name, "Switch"]
             device_box = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
-            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.6))
+            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.5, color=(1,1,1,1)))
             client.send_to_client(state)
-            switch = BoxLayout(id=client.ip, orientation="horizontal", spacing=0.3, size_hint_x=0.3, )
+            switch = BoxLayout(id=client.ip, orientation="horizontal", spacing=0.5, size_hint_x=0.5)
             if state is True:
-                bt_on = ToggleButton(text='ON', group='switch', state="down", allow_no_selection=False)
-                bt_off = ToggleButton(text='OFF', group='switch', state="normal", allow_no_selection=False)
+                bt_on = ToggleButton(text='ON', group='switch', state="down", allow_no_selection=False, color=(1,1,1,1), )
+                bt_off = ToggleButton(text='OFF', group='switch', state="normal", allow_no_selection=False, color=(1,1,1,1), )
 
             elif state is False:
-                bt_on = ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False)
-                bt_off = ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False)
+                bt_on = ToggleButton(text='ON', group='switch', state="normal", allow_no_selection=False, color=(1,1,1,1), )
+                bt_off = ToggleButton(text='OFF', group='switch', state="down", allow_no_selection=False, color=(1,1,1,1), )
             callback = lambda _: self.change_state(client, bt_on.state, bt_on, device_box)
             bt_on.bind(on_press=callback)
             callback = lambda _: self.change_state(client, bt_off.state, bt_off, device_box)
@@ -97,20 +97,22 @@ class device_control:
             self.bt_on = bt_on
             self.bt_off = bt_off
             switch.add_widget(self.bt_off)
+            switch.add_widget(Label(text=" "))
             switch.add_widget(self.bt_on)
+            switch.add_widget(Label())
 
 
 
         elif client.type == "R":
             device_list = [client.name, "Switch"]
             device_box = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
-            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.6))
+            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.5, color=(1, 1, 1, 1)))
             client.send_to_client(state)
-            switch = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.4, )
+            switch = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_x=0.5, )
 
-            bt_up = Button(text='+', bold=True)
-            level = Label(id="level", text=str(state))
-            bt_down = Button(text='-', bold=True)
+            bt_up = Button(text='+', bold=True, color=(1,1,1,1))
+            level = Label(id="level", text=str(state), color=(1,1,1,1))
+            bt_down = Button(text='-', bold=True, color=(1,1,1,1))
             callback = lambda _: self.change_state(client, level, bt_up.text, device_box)
             bt_up.bind(on_press=callback)
             callback = lambda _: self.change_state(client, level, bt_down.text, device_box)
@@ -121,6 +123,7 @@ class device_control:
             switch.add_widget(bt_down)
             switch.add_widget(self.level)
             switch.add_widget(bt_up)
+            switch.add_widget(Label())
 
 
         device_box.add_widget(switch)

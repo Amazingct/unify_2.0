@@ -23,7 +23,7 @@ load.value(0)
 with open("config.txt") as config:
     d = json.loads(config.read())
     HOST = d["hub"]
-    PORT = d["port"]
+    PORT = 65433
 
 s = 0
 
