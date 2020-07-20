@@ -16,6 +16,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
 import  urllib
+import cv2
+
+
+
 hub_sensor = {"humidity":'0', "temperature":'0'}
 connection = "cloud"
 rx = "no"
@@ -210,6 +214,7 @@ class Login(Screen):
     password = ObjectProperty(None)
     email = ObjectProperty(None)
     r_password = ObjectProperty(None)
+    bg = ObjectProperty(None)
 
     def button_action(self, button):
         def action():
@@ -298,9 +303,10 @@ class Home(Screen):
     email = ObjectProperty(None)
     devices_box = ObjectProperty(None)
     hub_humidity = ObjectProperty(None)
-    hub_temperature = ObjectProperty(None)
+    # bg = ObjectProperty(None)
     cloud = ObjectProperty(None)
     local = ObjectProperty(None)
+
 
     def refresh(self):
         global hub_sensor
@@ -309,7 +315,7 @@ class Home(Screen):
         self.hub_humidity.text = "Humidity " + hub_sensor["humidity"] + "%"
 
     def render(self):
-        #t.Thread(target=self.refresh).start()
+        #t.Thread(target=self.bgchange).start()
         global connection
         with open(path + "user.json", "r") as user_file:
             user = json.loads(user_file.read())

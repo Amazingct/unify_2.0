@@ -1,16 +1,32 @@
 # DEFAULT
 <Button>:
-    color:0.3,0.6,0.7,1
+    color:1,1,1,1
 <Label>:
     font_size: 15
-    color:0.3,0.6,0.7,1
+    #color:0.3,0.6,0.7,1
 
 # create a new class that inherit from button behavior and Labels(no background)
 <FlatButton@ButtonBehavior+Label>:
     font_size: 16
 
+<BoldLabel@Label>:
+    font_size: 15
+    color: 1,1,1,1
+    bold:True
 
-
+<SmoothButton@Button>:
+    background_color: (0,0,0,0)
+    background_normal: ""
+    back_color: (1,0,1,1)
+    border_radius:[12]
+    bold:True
+    canvas.before:
+        Color:
+            rgba:self.back_color
+        RoundedRectangle:
+            size:self.size
+            pos:self.pos
+            radius:self.border_radius
 #info popup
 <Info>:
     info:info
@@ -97,93 +113,172 @@
             text:"Cancle"
             on_release:root.response("cancle")
 
-
-
-
 <Login>:
     name: "login"
     password: password
+
     email: email
     user_id: 0
-    FloatLayout:
-        GridLayout:
-            cols: 1
-            size_hint: 0.5, 0.3
-            pos_hint: {"x":0.25,"top":0.5}
 
-            # INSIDE GRID
-            GridLayout:
-                cols: 2
-                Label:
-                    text:"Email: "
-                TextInput:
-                    id:email
-                    multiline:False
-                    font_size: 15
-                    size_hint: 4, 1
+    BoxLayout:
+        orientation:"vertical"
+        canvas.before:
+            Color:
+                rgba:(1,1,1,0.7)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'bg.jpg'
 
-                Label:
-                    text:"Password: "
-                TextInput:
-                    id: password
-                    multiline:False
-                    font_size: 15
-                    size_hint: 4, 1
-                    password: True
-                    on_text_validate: root.button_action("login")
+        # Empty top
+        Label:
+            size_hint_y: 0.37
+        BoxLayout:
+            size_hint_y:0.25
+            orientation:"horizontal"
+            BoxLayout:
+                orientation:"vertical"
+                size_hint_x: 0.4
+                spacing: 4
+                # MAIN SECTION
+                Widget:
 
-            Button:
-                text:"Login"
-                on_release:root.button_action("login")
+                BoxLayout:
+                    orientation:"horizontal"
+                    Widget:
+                        size_hint_x: 0.3
+                    TextInput:
+                        size_hint_x: 0.7
+                        hint_text: "Email"
+                        id:email
+                        multiline:False
+                        font_size: 12
+                BoxLayout:
+                    orientation:"horizontal"
+                    Widget:
+                        size_hint_x: 0.3
+                    TextInput:
+                        size_hint_x: 0.7
+                        id: password
+                        hint_text: "Password"
+                        multiline:False
+                        font_size: 12
+                        password: True
+                BoxLayout:
+                    orientation:"horizontal"
+                    spacing:10
+                    Widget:
+                        size_hint_x: 0.3
+                    SmoothButton:
+                        size_hint_x: 0.35
+                        text:"Register"
+                        back_color:(0.157, 0.455, 0.753, 1.0)
 
-            Button:
-                text:"Register"
-                on_release:root.button_action("register")
+                        on_release: root.button_action("register")
+                    SmoothButton:
+                        size_hint_x: 0.35
+                        text:"Login"
+                        back_color:(0.157, 0.455, 0.753, 1.0)
+                        on_release: root.button_action("login")
+            Label:
+                size_hint_x: 0.6
+        # Empty bottom
+        Label:
+            size_hint_y: 0.37
 
 <Register>:
     name: "register"
     password: password
     r_password: r_password
     email: email
-    FloatLayout:
-        GridLayout:
-            cols: 1
-            size_hint: 0.5, 0.3
-            pos_hint: {"x":0.25,"top":0.5}
 
-            # INSIDE GRID
-            GridLayout:
-                cols: 2
-                Label:
-                    text:"Email: "
-                TextInput:
-                    id:email
-                    multiline:False
-                    font_size: 15
-                    size_hint: 4, 1
+    BoxLayout:
+        orientation:"vertical"
+        canvas.before:
+            Color:
+                rgba:(1,1,1,0.7)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: 'bg.jpg'
 
-                Label:
-                    text:"Password: "
-                TextInput:
-                    id: password
-                    multiline:False
-                    font_size: 15
-                    size_hint: 4, 1
-                    password: True
-                Label:
-                    text:"Password: "
-                TextInput:
-                    id: r_password
-                    multiline:False
-                    font_size: 15
-                    size_hint: 4, 1
-                    password: True
-            Button:
-                text:"Submit"
-                on_release: root.button_action("submit")
-            Button:
-                text:"Login"
-                on_release: root.button_action("back_to_login")
+        # Empty top
+        Label:
+            size_hint_y: 0.37
+
+
+        BoxLayout:
+            size_hint_y:0.25
+            orientation:"horizontal"
+
+
+            BoxLayout:
+                orientation:"vertical"
+                size_hint_x: 0.4
+                spacing: 4
+
+                # MAIN SECTION
+                BoxLayout:
+                    orientation:"horizontal"
+                    Widget:
+                        size_hint_x: 0.3
+                    TextInput:
+                        size_hint_x: 0.7
+                        hint_text: "Email"
+                        id:email
+                        multiline:False
+                        font_size: 12
+
+                BoxLayout:
+                    orientation:"horizontal"
+                    Widget:
+                        size_hint_x: 0.3
+                    TextInput:
+                        size_hint_x: 0.7
+                        id: password
+                        hint_text: "Password"
+                        multiline:False
+                        font_size: 12
+                        password: True
+
+                BoxLayout:
+                    orientation:"horizontal"
+                    Widget:
+                        size_hint_x: 0.3
+                    TextInput:
+                        size_hint_x: 0.7
+                        hint_text: "Retype password"
+                        id: r_password
+                        multiline:False
+                        font_size: 12
+                        password: True
+
+                BoxLayout:
+                    orientation:"horizontal"
+                    spacing:10
+                    Widget:
+                        size_hint_x: 0.3
+
+                    SmoothButton:
+                        size_hint_x: 0.35
+                        text:"Submit"
+                        bold: 1
+                        back_color:(0.157, 0.455, 0.753, 1.0)
+                        on_release: root.button_action("submit")
+                    SmoothButton:
+                        size_hint_x: 0.35
+                        text:"Login"
+                        bold: 1
+                        back_color:(0.157, 0.455, 0.753, 1.0)
+                        on_release: root.button_action("back_to_login")
+            Label:
+                size_hint_x: 0.6
+
+
+        # Empty bottom
+        Label:
+            size_hint_y: 0.37
+
 
 <Home>:
     name: "home"
@@ -199,7 +294,7 @@
 
     BoxLayout:
         orientation:"vertical"
-        # spacing:10
+        spacing:10
         canvas.before:
             Color:
                 rgba:(1,1,1,0.7)
@@ -244,7 +339,7 @@
                 id: email
                 text: ""
                 bold: True
-                size_hint_x: 0.96
+                size_hint_x: 0.94
             ToggleButton:
                 id: local
                 text: "Local"
@@ -263,6 +358,9 @@
                 allow_no_selection:False
                 on_press:root.button_action("cloud")
                 size_hint_x: 0.07
+            Widget:
+                size_hint_x: 0.02
+
 
 
         BoxLayout:
