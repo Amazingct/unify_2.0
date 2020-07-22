@@ -1,1 +1,1 @@
-{"local_hub": {"ID": "-MAxVtweK0ckviC9X3zu", "Name": "Temperature", "Type": "S", "State": 29}, "10.42.0.24": {"ID": "-MB-r-73r7tk3nGAdeoU", "Name": "FAN", "Type": "R", "State": 2}, "10.42.0.22": {"ID": "-MCJA3hpa1lbq3JqOcwH", "Name": "TV", "Type": "T", "State": false}}
+{"local_hub": {"ID": "-MAxVtweK0ckviC9X3zu", "Name": "Temperature", "Type": "S", "State": 21}, "10.42.0.24": {"ID": "-MB-r-73r7tk3nGAdeoU", "Name": "FAN", "Type": "R", "State": 2}, "10.42.0.22": {"ID": "-MCJA3hpa1lbq3JqOcwH", "Name": "TV", "Type": "T", "State": true}}

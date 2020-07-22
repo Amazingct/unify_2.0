@@ -16,8 +16,19 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
 import  urllib
-import cv2
+from kivy.core.text import LabelBase
 
+
+#window graphics
+from kivy.config import Config
+Config.set('graphics', 'fullscreen', 'fake')
+Config.set('graphics', 'position', 'custom')
+Config.set('graphics', 'top', '300')
+Config.set('graphics', 'left', '300')
+from kivy.core.window import Window
+Window.fullscreen = True
+# ##################################
+LabelBase.register(name="font", fn_regular="font.ttf")
 
 
 hub_sensor = {"humidity":'0', "temperature":'0'}

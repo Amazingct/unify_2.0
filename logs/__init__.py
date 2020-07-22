@@ -4,7 +4,7 @@ import logging
 from bugsnag.handlers import BugsnagHandler
 import os
 dir ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
-log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/"
+log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 
 
 LOG_FORMAT = "/%(levelname)s %(asctime)s - %(message)s"
