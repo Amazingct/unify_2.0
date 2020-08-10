@@ -3,8 +3,9 @@ import json
 import logging
 from bugsnag.handlers import BugsnagHandler
 import os
+#dir = "/home/ubuntu/Desktop/unify_2/configurations/"
 dir ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
-log_dirr ="/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
+
 
 
 LOG_FORMAT = "/%(levelname)s %(asctime)s - %(message)s"
@@ -12,7 +13,7 @@ logging.basicConfig(filename=dir+"logs.log", level=logging.DEBUG, format=LOG_FOR
 logger = logging.getLogger()
 
 
-bugsnag.configure(api_key="22177300d77526c97f63abd8dab93752", project_root=log_dirr)
+bugsnag.configure(api_key="22177300d77526c97f63abd8dab93752", project_root=dir)
 logger = logging.getLogger("unify_2.logger")
 handler = BugsnagHandler()
 handler.setLevel(logging.ERROR)

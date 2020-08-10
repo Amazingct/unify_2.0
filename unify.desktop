@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Encoding=UTF-8
-Name=Unify
-Exec=/usr/bin/python3.6 /home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/start.py
-Icon=application.png
-Terminal=false

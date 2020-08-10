@@ -4,6 +4,7 @@ import Gui
 from time import sleep
 import threading as t
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
+#path = "/home/ubuntu/Desktop/unify_2/configurations/"
 HOST = ''
 PORT = 65433  # Port to listen on (non-privileged ports are > 1023) for client devices
 

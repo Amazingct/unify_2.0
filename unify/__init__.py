@@ -7,6 +7,7 @@ from random import randint
 
 from time import sleep
 #  path to configuration files
+#path = "/home/ubuntu/Desktop/unify_2/configurations/"
 path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
 child = "users" # fire-base real-time db child
 ready = False
@@ -85,7 +86,7 @@ def change_state(device, state, button, switch):
 
 
 try:
-    with open(path + "cofig.json") as config_file:
+    with open(path + "firebase_config.json") as config_file:
         config = json.loads(config_file.read())
     fire_base = pyrebase.initialize_app(config)
     auth = fire_base.auth()
@@ -96,14 +97,15 @@ except Exception as e:
 
 
 def update_hub_sensor_data():
+    from datetime import datetime
     global hub
     while 1:
         sleep(2)
         temperature = randint(20,37) #get from sensor
-        humidity = 56
+        humidity = datetime.now()
         data = {"State": temperature}
         cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"
-        cl.Gui.home.hub_humidity.text = "Humidity " + str(humidity) + "%"
+        cl.Gui.home.hub_humidity.text =str(humidity)[:-10]
         try:
             if cl.Gui.connection == "cloud":
                 d = database.child("users").child(hub.id).child(hub.get_client_info_from_localdb("Temperature")["ID"]).update(data)
