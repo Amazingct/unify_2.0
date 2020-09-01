@@ -52,8 +52,6 @@
             id: no_button
             text:"No"
             on_release:root.response("no")
-
-
 #sign in/log in info popup
 
 <login_info>:
@@ -81,11 +79,11 @@
         orientation: "vertical"
 
         Label:
-            size_hint_y:0.4
+            size_hint_y:0.2
             text:""
          # NAME OF DEVICE
         BoxLayout:
-            size_hint_y:0.1
+            size_hint_y:0.2
             orientation: "horizontal"
             Label:
                 text: "Name"
@@ -95,7 +93,7 @@
                 multiline:False
         # TYPE OF DEVICE
         BoxLayout:
-            size_hint_y:0.1
+            size_hint_y:0.2
             orientation: "horizontal"
             Label:
                 text: "Type"
@@ -490,7 +488,6 @@
             Button:
                 text:"back"
                 on_release: root.button_action("home")
-
 
 
 

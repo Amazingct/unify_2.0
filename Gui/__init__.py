@@ -18,9 +18,8 @@ import pyrebase
 import json
 import urllib
 from kivy.core.text import LabelBase
-#popup size
-puw = 450
-puh = 350
+
+
 # window graphics and size
 from kivy.config import Config
 Config.set('graphics', 'width', '800')
@@ -31,7 +30,7 @@ Config.set('graphics', 'top', '200')
 Config.set('graphics', 'left', '200')
 from kivy.core.window import Window
 Config.write()
-#Window.fullscreen = True
+Window.fullscreen = True
 # ##################################
 LabelBase.register(name="font", fn_regular="font.ttf")
 hub_sensor = {"humidity": '0', "temperature": '0'}
@@ -195,14 +194,12 @@ def show_popup(title, info, type):
     if type == "add?":
         pop = Info()
         pop.info.text = info
-        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(puw, puh), auto_dismiss=False)
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(500, 350), auto_dismiss=False)
         pop.yes_button.bind(on_press=popUp.dismiss)
         pop.no_button.bind(on_press=popUp.dismiss)
         popUp.open()
-
         while done != True:
             pass
-
         done = False
         return rx
 
@@ -211,7 +208,7 @@ def show_popup(title, info, type):
     elif type == "add":
         pop = Add_new()
         pop.info.text = info
-        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(puw, puh), auto_dismiss=False)
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(500, 350), auto_dismiss=False)
         pop.add.bind(on_press=popUp.dismiss)
         pop.cancle.bind(on_press=popUp.dismiss)
         popUp.open()
@@ -223,7 +220,7 @@ def show_popup(title, info, type):
     elif type == "info":
         pop = login_info()
         pop.info.text = info
-        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(puw, puh))
+        popUp = Popup(title=title, content=pop, size_hint=(None, None), size=(500, 350))
         popUp.open()
         return rx  # this will be a tuple instaed (c_name, c_type)
 
@@ -409,7 +406,6 @@ class All_devices(Screen):
 
 # ________________________________________________________________________________________________________________
 # load kv file
-print("here")
 Builder.load_file(path[:-15] + "Gui/unify_.kv")
 
 d = All_devices(name="devices")
@@ -434,5 +430,4 @@ class Unify(App):
 
 def start():
     Unify().run()
-
 
