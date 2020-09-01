@@ -1,1 +1,1 @@
-{"Local_Hub": {"ID": "-MCJHIhQbIDDdRLDOajV", "Name": "Temperature", "Type": "S", "State": 30}, "10.42.0.22": {"ID": "-MCSozUo-v3c4FujVNwp", "Name": "LAMP", "Type": "T", "State": true}, "10.42.0.24": {"ID": "-MCbf66Hv79PNdwjISWX", "Name": "ROOM FAN", "Type": "R", "State": 0}}
+{"Local_Hub": {"ID": "-MCJHIhQbIDDdRLDOajV", "Name": "Temperature", "Type": "S", "State": 28}}

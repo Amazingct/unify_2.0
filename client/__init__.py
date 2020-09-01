@@ -96,7 +96,7 @@ class Client:
 
         elif neww is True:
             print(addr, "connected")
-            a = Gui.show_popup("NEW DEVICE", "Do you want to add?","add?")
+            a = Gui.show_popup("NEW DEVICE", "Do you want to add?", "add?")
             # a = input("Do you want to add new client (y/n) ? ")
             if a == "yes":
                 id, name, ttype = add_new_client_to_db(hub, addr[0])
