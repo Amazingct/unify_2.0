@@ -4,11 +4,12 @@ import client as cl
 import threading as t
 import logs
 from random import randint
+import os
 
 from time import sleep
 #  path to configuration files
-#path = "/home/ubuntu/Desktop/unify_2/configurations/"
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
+pwd = str(os.getcwd())
+path = pwd+ "/configurations/"
 child = "users" # fire-base real-time db child
 ready = False
 hub = None
@@ -101,7 +102,7 @@ def update_hub_sensor_data():
     global hub
     while 1:
         sleep(2)
-        temperature = randint(20,37) #get from sensor
+        temperature = randint(25,32) #get from sensor
         humidity = datetime.now()
         data = {"State": temperature}
         cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"

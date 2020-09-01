@@ -8,6 +8,7 @@ from kivy.uix.button import Label, Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.floatlayout import FloatLayout
+import os
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty
@@ -18,24 +19,27 @@ import json
 import urllib
 from kivy.core.text import LabelBase
 
+
 # window graphics and size
 from kivy.config import Config
-#Config.set('graphics', 'fullscreen', 'fake')
-Config.set('graphics', 'position', 'custom')
-Config.set('graphics', 'top', '0')
-Config.set('graphics', 'left', '0')
+Config.set('graphics', 'width', '800')
+Config.set('graphics', 'height', '450')
+# Config.set('graphics', 'fullscreen', 'fake')
+# Config.set('graphics', 'position', 'custom')
+Config.set('graphics', 'top', '200')
+Config.set('graphics', 'left', '200')
 from kivy.core.window import Window
+Config.write()
 # Window.fullscreen = True
 # ##################################
 LabelBase.register(name="font", fn_regular="font.ttf")
-
 hub_sensor = {"humidity": '0', "temperature": '0'}
 connection = "cloud"
 rx = "no"
 done = False
 user = {}
-#path = "/home/ubuntu/Desktop/unify_2/configurations/"
-path = "/home/amazing/Desktop/PROJECTS_AND_CODES/unify_2/configurations/"
+pwd = str(os.getcwd())
+path = pwd+ "/configurations/"
 child = "users"  # fire-base real-time db child
 
 
