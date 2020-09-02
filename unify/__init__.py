@@ -102,7 +102,7 @@ def update_hub_sensor_data():
     global hub
     while 1:
         sleep(2)
-        temperature = randint(25,32) #get from sensor
+        temperature = randint(31,32) #get from sensor
         humidity = datetime.now()
         data = {"State": temperature}
         cl.Gui.home.hub_temperature.text =str(temperature) + u'\N{DEGREE SIGN}' + "C"

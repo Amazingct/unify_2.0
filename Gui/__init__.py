@@ -1,3 +1,17 @@
+# window graphics and size
+from kivy.config import Config
+Config.set('graphics', 'width', '800')
+Config.set('graphics', 'height', '450')
+Config.set('graphics', 'fullscreen', 'fake')
+Config.set('graphics', 'position', 'custom')
+Config.set('graphics', 'top', '200')
+Config.set('graphics', 'left', '200')
+Config.set('kivy', 'keyboard_mode', 'systemanddock')
+from kivy.core.window import Window
+Config.write()
+Window.fullscreen = True
+
+
 from kivy.app import App
 from kivy.uix.togglebutton import ToggleButton, ToggleButtonBehavior
 import time
@@ -17,20 +31,11 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 import pyrebase
 import json
 import urllib
+import requests
 from kivy.core.text import LabelBase
 
 
-# window graphics and size
-from kivy.config import Config
-Config.set('graphics', 'width', '800')
-Config.set('graphics', 'height', '450')
-Config.set('graphics', 'fullscreen', 'fake')
-Config.set('graphics', 'position', 'custom')
-Config.set('graphics', 'top', '200')
-Config.set('graphics', 'left', '200')
-from kivy.core.window import Window
-Config.write()
-Window.fullscreen = True
+
 # ##################################
 LabelBase.register(name="font", fn_regular="font.ttf")
 hub_sensor = {"humidity": '0', "temperature": '0'}
@@ -82,7 +87,7 @@ except Exception as e:
 
 def connected_to_internet(host="https://google.com"):
     try:
-        urllib.request.urlopen(host)
+        r = requests.get(host, timeout=5)
         print("Internet available")
         return True
     except Exception as e:
