@@ -9,7 +9,7 @@ Config.set('graphics', 'left', '200')
 Config.set('kivy', 'keyboard_mode', 'systemanddock')
 from kivy.core.window import Window
 Config.write()
-Window.fullscreen = True
+#Window.fullscreen = True
 
 
 from kivy.app import App
@@ -435,4 +435,5 @@ class Unify(App):
 
 def start():
     Unify().run()
+
 
