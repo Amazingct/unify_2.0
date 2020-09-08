@@ -15,11 +15,17 @@ ready = False
 hub = None
 
 
+def get_state(state, pos):
+    if state[pos] == '1':
+        return "down"
+    elif state[pos] == '0':
+        return "normal"
 def change_state(device, state, button, switch):
     try:
         button = button.text
     except:
         button = button
+
 
     def changing():
         global hub, ready
@@ -30,16 +36,43 @@ def change_state(device, state, button, switch):
             all = hub.get_localdb_data()
             all[device.ip]["State"] = new_state
 
-
         elif button == "ON" and state == "down":
             new_state = True
             all = hub.get_localdb_data()
             all[device.ip]["State"] = new_state
 
 
+        #extension
+
+        elif button == "A" and state == "down":
+            all = hub.get_localdb_data()
+            new_state = '1'+ str(all[device.ip]["State"][1:])  # change first state only
+            all[device.ip]["State"] = new_state
+        elif button == "B" and state == "down":
+            all = hub.get_localdb_data()
+            new_state = str(all[device.ip]["State"][0])  + '1'+ str(all[device.ip]["State"][2])
+            all[device.ip]["State"] = new_state
+        elif button == "C" and state == "down":
+            all = hub.get_localdb_data()
+            new_state = str(all[device.ip]["State"][:2]) + '1'
+            all[device.ip]["State"] = new_state
+        elif button == "A":
+            all = hub.get_localdb_data()
+            new_state = '0'+ str(all[device.ip]["State"][1:])  # change first state only
+            all[device.ip]["State"] = new_state
+        elif button == "B":
+            all = hub.get_localdb_data()
+            new_state = str(all[device.ip]["State"][0])  + '0'+ str(all[device.ip]["State"][2])
+            all[device.ip]["State"] = new_state
+        elif button == "C":
+            all = hub.get_localdb_data()
+            new_state = str(all[device.ip]["State"][:2]) + '0'
+            all[device.ip]["State"] = new_state
+
         elif state == "down":
             pass
 
+        #end of extension
         elif button == "+":
             old_state = hub.get_client_info_from_localdb(device.name)["State"]
             new_state = old_state + 1
@@ -60,13 +93,12 @@ def change_state(device, state, button, switch):
             state.text = str(new_state)
 
 
-
         # when syncing(internet)is off update local db and client manually
         # if there is internet this will be done by the sync thread automatically
         if not cl.Gui.connection == "cloud":
             # update client state and local db
             try:
-                device.send_to_client(int(new_state), switch)
+                device.send_to_client(new_state, switch) #send the switch too, to be able to remove it when disconnecetd
                 hub.update_localdb_data(all)
             except Exception as e:
                 print("send", e)
@@ -198,6 +230,10 @@ class Hub:
                                     device.control.bt_on.state = "down"; device.control.bt_off.state = "normal"
                                 elif data[device.ip]["State"] == False and device.type == "T":
                                     device.control.bt_off.state = "down";device.control.bt_on.state = "normal"
+                                elif device.type == "E":
+                                    device.control.bt1.state = get_state(data[device.ip]["State"], 0)
+                                    device.control.bt2.state = get_state(data[device.ip]["State"], 1)
+                                    device.control.bt3.state = get_state(data[device.ip]["State"], 2)
                                 else:
                                     device.control.level.text = str(data[device.ip]["State"])
 

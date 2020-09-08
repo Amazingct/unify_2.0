@@ -3,27 +3,30 @@ from time import sleep
 from machine import UART
 import socket
 import json
+
 connected = 0
 
-uart = UART(2, 9600)                         # init with given baudrate
+uart = UART(2, 9600)  # init with given baudrate
 uart.init(9600, bits=8, parity=None, stop=1)
 import neopixel
-led = neopixel.NeoPixel(Pin(5),1)
+
+led = neopixel.NeoPixel(Pin(2), 1)
 red = (255, 0, 0)
 green = (120, 153, 23)
-blue = (125, 204,233)
-off = (0,0,0)
+blue = (125, 204, 233)
+off = (0, 0, 0)
+
 
 def led_write(color):
     global led
     led[0] = color
     led.write()
 
+
 load = Pin(4, Pin.OUT)  # d7
 
 # set load to off
 load.value(0)
-
 
 with open("config.json") as config:
     d = json.loads(config.read())
@@ -63,11 +66,13 @@ while connected == 0:
 while True:
     try:
         data = s.recv(1024)
-        print('Received', repr(data))
+
         if data == bytes("quit", "utf-8"):
             s.close()
             break
         else:
+            data = str(data)[2:-1]
+            print(data + "-")
             if '1' in data:
                 led_write(red)
             else:
@@ -80,9 +85,9 @@ while True:
         connect2hub()
         print(e)
 
-
 led_write(red)
 s.close()
+
 
 
 

@@ -1,1 +1,1 @@
-{"Local_Hub": {"ID": "-MCJHIhQbIDDdRLDOajV", "Name": "Temperature", "Type": "S", "State": 31}, "192.168.8.102": {"ID": "-MGF0SW8y1AW9Y7ndx0L", "Name": "SMART TV", "Type": "T", "State": true}}
+{"Local_Hub": {"ID": "-MCJHIhQbIDDdRLDOajV", "Name": "Temperature", "Type": "S", "State": 32}, "192.168.8.102": {"ID": "-MGF0SW8y1AW9Y7ndx0L", "Name": "SMART TV", "Type": "T", "State": true}, "192.168.43.213": {"ID": "-MGjsyy9BJOwc0AfVJqP", "Name": "media", "Type": "E", "State": "010"}}

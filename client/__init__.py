@@ -56,6 +56,14 @@ def add_new_client_to_db(hub, ip):
                 wrong = False
                 print(result)
                 c_id = result["name"]
+            elif c_type == "E":
+                state = '000'
+                # post new data with new tag
+                result = hub.add_client(IP=ip, Name=c_name, Type=c_type, State=state)
+                wrong = False
+                print(result)
+                c_id = result["name"]
+
             elif c_type == "R" or c_type == "S":
                 state = 0
                 # post new data with new tag

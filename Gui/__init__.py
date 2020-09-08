@@ -152,6 +152,44 @@ class device_control:
             switch.add_widget(self.level)
             switch.add_widget(bt_up)
             switch.add_widget(Label())
+            # Extension
+        elif client.type == "E":
+            device_list = [client.name, "Switch"]
+            device_box = BoxLayout(orientation="horizontal", spacing=0.3, size_hint_y=None, size=(0, 40))
+            device_box.add_widget(Label(text=device_list[0], bold=True, size_hint_x=0.5, color=(1, 1, 1, 1)))
+            client.send_to_client(state)
+            switch = BoxLayout(id=client.ip, orientation="horizontal", spacing=0.5, size_hint_x=0.5)
+            print()
+            def get_state(state, pos):
+                if state[pos] == '1':
+                    return "down"
+                elif state[pos] == '0':
+                    return "normal"
+
+            bt1 = ToggleButton(text='A', group='switch1', state=get_state(state,0), allow_no_selection=True,
+                                 color=(1, 1, 1, 1), )
+            bt2 = ToggleButton(text='B', group='switch2', state=get_state(state,1), allow_no_selection=True,
+                                  color=(1, 1, 1, 1), )
+            bt3 = ToggleButton(text='C', group='switch3', state=get_state(state,2), allow_no_selection=True,
+                                 color=(1, 1, 1, 1), )
+
+            callback = lambda _: self.change_state(client, bt1.state, bt1, device_box)
+            bt1.bind(on_press=callback)
+            callback = lambda _: self.change_state(client, bt2.state, bt2, device_box)
+            bt2.bind(on_press=callback)
+            callback = lambda _: self.change_state(client, bt3.state, bt3, device_box)
+            bt3.bind(on_press=callback)
+
+            self.bt1 = bt1
+            self.bt2 = bt2
+            self.bt3 = bt3
+            
+            switch.add_widget(self.bt1)
+            switch.add_widget(Label(text=" "))
+            switch.add_widget(self.bt2)
+            switch.add_widget(Label())
+            switch.add_widget(self.bt3)
+
 
         device_box.add_widget(switch)
         self.device_box = device_box
