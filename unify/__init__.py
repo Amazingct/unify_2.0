@@ -5,8 +5,8 @@ import threading as t
 import logs
 from random import randint
 import os
-
 from time import sleep
+
 #  path to configuration files
 pwd = str(os.getcwd())
 path = pwd+ "/configurations/"
@@ -14,23 +14,39 @@ child = "users" # fire-base real-time db child
 ready = False
 hub = None
 
+# get firebase configuration files
+try:
+    with open(path + "firebase_config.json") as config_file:
+        config = json.loads(config_file.read())
+    fire_base = pyrebase.initialize_app(config)
+    auth = fire_base.auth()
+    database = fire_base.database()
+except Exception as e:
+    print("fire base init:", e)
 
+
+# function to get state of a specific port in an extension type
 def get_state(state, pos):
     if state[pos] == '1':
         return "down"
     elif state[pos] == '0':
         return "normal"
+
+
+# function that is called when a device state change button is pressed (starts a thread)
 def change_state(device, state, button, switch):
+    # get device name
     try:
         button = button.text
     except:
         button = button
 
-
     def changing():
         global hub, ready
         # stop syncing
         ready = False
+
+        # toggle type
         if button == "OFF" and state == "down":
             new_state = False
             all = hub.get_localdb_data()
@@ -42,15 +58,14 @@ def change_state(device, state, button, switch):
             all[device.ip]["State"] = new_state
 
 
-        #extension
-
+        # extension
         elif button == "A" and state == "down":
             all = hub.get_localdb_data()
-            new_state = '1'+ str(all[device.ip]["State"][1:])  # change first state only
+            new_state = '1' + str(all[device.ip]["State"][1:])  # change first state only
             all[device.ip]["State"] = new_state
         elif button == "B" and state == "down":
             all = hub.get_localdb_data()
-            new_state = str(all[device.ip]["State"][0])  + '1'+ str(all[device.ip]["State"][2])
+            new_state = str(all[device.ip]["State"][0]) + '1' + str(all[device.ip]["State"][2])
             all[device.ip]["State"] = new_state
         elif button == "C" and state == "down":
             all = hub.get_localdb_data()
@@ -58,11 +73,11 @@ def change_state(device, state, button, switch):
             all[device.ip]["State"] = new_state
         elif button == "A":
             all = hub.get_localdb_data()
-            new_state = '0'+ str(all[device.ip]["State"][1:])  # change first state only
+            new_state = '0' + str(all[device.ip]["State"][1:])  # change first state only
             all[device.ip]["State"] = new_state
         elif button == "B":
             all = hub.get_localdb_data()
-            new_state = str(all[device.ip]["State"][0])  + '0'+ str(all[device.ip]["State"][2])
+            new_state = str(all[device.ip]["State"][0]) + '0' + str(all[device.ip]["State"][2])
             all[device.ip]["State"] = new_state
         elif button == "C":
             all = hub.get_localdb_data()
@@ -72,12 +87,15 @@ def change_state(device, state, button, switch):
         elif state == "down":
             pass
 
-        #end of extension
+
+        # regulator type
         elif button == "+":
             old_state = hub.get_client_info_from_localdb(device.name)["State"]
             new_state = old_state + 1
-            if new_state >= 5: new_state = 0
-            elif new_state < 0: new_state = 0
+            if new_state >= 5:
+                new_state = 0
+            elif new_state < 0:
+                new_state = 0
             all = hub.get_localdb_data()
             all[device.ip]["State"] = new_state
             state.text = str(new_state)
@@ -86,24 +104,26 @@ def change_state(device, state, button, switch):
         elif button == "-":
             old_state = hub.get_client_info_from_localdb(device.name)["State"]
             new_state = old_state - 1
-            if new_state >= 5: new_state = 0
-            elif new_state < 0: new_state = 0
+            if new_state >= 5:
+                new_state = 0
+            elif new_state < 0:
+                new_state = 0
             all = hub.get_localdb_data()
             all[device.ip]["State"] = new_state
             state.text = str(new_state)
-
 
         # when syncing(internet)is off update local db and client manually
         # if there is internet this will be done by the sync thread automatically
         if not cl.Gui.connection == "cloud":
             # update client state and local db
             try:
-                device.send_to_client(new_state, switch) #send the switch too, to be able to remove it when disconnecetd
+                device.send_to_client(new_state,
+                                      switch)  # send the switch too, to be able to remove it when disconnecetd
                 hub.update_localdb_data(all)
             except Exception as e:
                 print("send", e)
 
-        # update database
+        # update local database
         try:
             if cl.Gui.connection == "cloud":
                 hub.update_client(device.name, State=new_state)
@@ -114,21 +134,7 @@ def change_state(device, state, button, switch):
     t.Thread(target=changing).start()
 
 
-
-
-
-
-try:
-    with open(path + "firebase_config.json") as config_file:
-        config = json.loads(config_file.read())
-    fire_base = pyrebase.initialize_app(config)
-    auth = fire_base.auth()
-    database = fire_base.database()
-except Exception as e:
-    print("fire base init:", e)
-
-
-
+# function for thread that update time and sensor value
 def update_hub_sensor_data():
     from datetime import datetime
     global hub
@@ -146,10 +152,7 @@ def update_hub_sensor_data():
             pass
 
 
-
-
 class Hub:
-
     def __init__(self, user):
         self.id = user["localId"]
         self.email = user["email"]
@@ -226,14 +229,17 @@ class Hub:
                         for device in cl.devices:
                             try:
                                 device.send_to_client(int(data[device.ip]["State"]))
+                                # update state GUI for toggle type
                                 if data[device.ip]["State"] == True and device.type == "T":
                                     device.control.bt_on.state = "down"; device.control.bt_off.state = "normal"
                                 elif data[device.ip]["State"] == False and device.type == "T":
                                     device.control.bt_off.state = "down";device.control.bt_on.state = "normal"
+                                # update state GUI for extension type
                                 elif device.type == "E":
                                     device.control.bt1.state = get_state(data[device.ip]["State"], 0)
                                     device.control.bt2.state = get_state(data[device.ip]["State"], 1)
                                     device.control.bt3.state = get_state(data[device.ip]["State"], 2)
+                                # update state GUI for regulator type
                                 else:
                                     device.control.level.text = str(data[device.ip]["State"])
 
@@ -241,8 +247,6 @@ class Hub:
                                 print("sync send to client:", e)
                                 device.conn.close()
                                 # logs.log(e)
-
-
 
                 except Exception as e:
                     print("Sync:", e)
@@ -256,7 +260,8 @@ class Hub:
 
     def __repr__(self):
         return self.id, self.email
-
+    #
+    # get local db data
     def get_localdb_data(self):
         try:
             with open(path + "db.json", "r") as db:
